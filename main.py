@@ -1,6 +1,7 @@
 import pygame
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_state
+import player
 
 
 def main():
@@ -15,6 +16,8 @@ def main():
     dt = 0 # Delta time - Change in time
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) # Set screen size as defined in constants.py
 
+    player1 = player.Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
+
     while True:
 
         log_state()
@@ -25,9 +28,12 @@ def main():
                 return
 
         screen.fill("black") # Background
+
+        player1.draw(screen) # Draw player
+
         pygame.display.flip()
 
-        dt = py_clock.tick(60) / 1000
+        dt = py_clock.tick(60) / 1000 # Ticks at 60 FPS (devision of 1000 is for milliseconds)
 
 if __name__ == "__main__":
     main()
