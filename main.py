@@ -13,7 +13,7 @@ def main():
     pygame.init() # Create pygame instance
 
     py_clock = pygame.time.Clock() # Create FPS clock
-    dt = 0 # Delta time - Change in time
+    dt = 0.0 # Delta time - Change in time
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) # Set screen size as defined in constants.py
 
     player1 = player.Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
@@ -31,7 +31,7 @@ def main():
 
         player1.draw(screen) # Draw player
 
-        pygame.display.flip()
+        pygame.display.flip() # Refreshes display
 
         dt = py_clock.tick(60) / 1000 # Ticks at 60 FPS (devision of 1000 is for milliseconds)
 

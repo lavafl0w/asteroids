@@ -9,7 +9,7 @@ class Player(circleshape.CircleShape):
 
 
     # Simply create triange points
-    def triangle(self):
+    def triangle(self) -> list[pygame.Vector2]:
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
         a = self.position + forward * self.radius
