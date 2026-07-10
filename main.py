@@ -20,16 +20,17 @@ def main():
 
     while True:
 
-        log_state()
+        log_state() # Start logger
 
         # This makes the close button on the window work
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
 
-        screen.fill("black") # Background
+        screen.fill("black") # Set background
 
         player1.draw(screen) # Draw player
+        player1.update(dt)        
 
         pygame.display.flip() # Refreshes display
 
