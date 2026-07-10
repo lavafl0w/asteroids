@@ -1,10 +1,10 @@
 import pygame
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
-from logger import log_state
+from logger import log_state, log_event
 import player
-import asteroid
+import asteroid as asteroid_class
 import asteroidfield
-
+import sys
 
 def main() -> None:
 
@@ -22,12 +22,12 @@ def main() -> None:
     
     # Group Creation
     updatable = pygame.sprite.Group() # Empty group of updatable objects
-    drawable = pygame.sprite.Group() # Empty group of drawbale objects
+    drawable = pygame.sprite.Group() # Empty group of drawable objects
     asteroids = pygame.sprite.Group() # Empty group of asteroid objects
     
     # Populating Groups
     player.Player.containers = (updatable, drawable) # Player class -> updatable and drawable groups
-    asteroid.Asteroid.containers = (updatable, drawable, asteroids) # Astroid class -> updatable, drawable and asteroids
+    asteroid_class.Asteroid.containers = (updatable, drawable, asteroids) # Astroid class -> updatable, drawable and asteroids
     asteroidfield.AsteroidField.containers = (updatable) # AstroidField class -> updatable
 
     # Object Creation
@@ -50,9 +50,15 @@ def main() -> None:
             item.draw(screen) # Draw everything in drawable group
         
         updatable.update(dt) # Update any movement in updatable group
+        
+        for asteroid in asteroids:
+            if asteroid.collides_with(player1) == True:
+                log_event("player_hit")
+                print("Game over!")
+                sys.exit()
 
         pygame.display.flip() # Refresh display
-        dt = py_clock.tick(60) / 1000 # Ticks at 60 FPS (devision of 1000 is for milliseconds)
+        dt = py_clock.tick(60) / 1000 # Ticks at 60 FPS (division of 1000 is for milliseconds)
 
 if __name__ == "__main__":
     main()
