@@ -1,10 +1,13 @@
 import pygame
+import sys
+
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_state, log_event
-import player
-import asteroid as asteroid_class
-import asteroidfield
-import sys
+
+from player import Player
+from asteroid import Asteroid
+from asteroidfield import AsteroidField
+from shot import Shot
 
 def main() -> None:
 
@@ -21,18 +24,20 @@ def main() -> None:
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) # Set screen size from constants.py
     
     # Group Creation
-    updatable = pygame.sprite.Group() # Empty group of updatable objects
-    drawable = pygame.sprite.Group() # Empty group of drawable objects
-    asteroids = pygame.sprite.Group() # Empty group of asteroid objects
+    updatable = pygame.sprite.Group() # type:ignore
+    drawable = pygame.sprite.Group() # type:ignore
+    asteroids = pygame.sprite.Group() # type:ignore
+    shots = pygame.sprite.Group() # type:ignore
     
-    # Populating Groups
-    player.Player.containers = (updatable, drawable) # Player class -> updatable and drawable groups
-    asteroid_class.Asteroid.containers = (updatable, drawable, asteroids) # Astroid class -> updatable, drawable and asteroids
-    asteroidfield.AsteroidField.containers = (updatable) # AstroidField class -> updatable
+    # Group Assignment
+    Player.containers = (updatable, drawable) # Player class -> updatable and drawable groups
+    Asteroid.containers = (updatable, drawable, asteroids) # Astroid class -> updatable, drawable and asteroids
+    AsteroidField.containers = (updatable) # AstroidField class -> updatable
+    Shot.containers = (updatable, drawable, shots)
 
     # Object Creation
-    player1 = player.Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
-    field = asteroidfield.AsteroidField() # Creates asteroid field
+    player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
+    field = AsteroidField() # Creates asteroid field # type:ignore
 
     # Game Loop
     while True:
@@ -46,13 +51,13 @@ def main() -> None:
 
         screen.fill("black") # Set background
         
-        for item in drawable:
-            item.draw(screen) # Draw everything in drawable group
+        for item in drawable: # type:ignore
+            item.draw(screen) # Draw everything in drawable group # type:ignore
         
         updatable.update(dt) # Update any movement in updatable group
         
-        for asteroid in asteroids:
-            if asteroid.collides_with(player1) == True:
+        for asteroid in asteroids: # type:ignore
+            if asteroid.collides_with(player1) == True: # type:ignore
                 log_event("player_hit")
                 print("Game over!")
                 sys.exit()
