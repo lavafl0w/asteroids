@@ -68,7 +68,7 @@ def main() -> None:
                 if asteroid.collides_with(bullet) == True:
                     log_event("asteroid_shot")
                     bullet.kill()
-                    asteroid.kill()
+                    asteroid.split()
 
         pygame.display.flip() # Refresh display
         dt = py_clock.tick(60) / 1000 # Ticks at 60 FPS (division of 1000 is for milliseconds)
