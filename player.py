@@ -3,7 +3,7 @@ import constants
 import pygame
 
 class Player(circleshape.CircleShape):
-    def __init__(self, x: float, y:float):
+    def __init__(self, x: float, y:float) -> None:
         super().__init__(x, y, constants.PLAYER_RADIUS)
         self.rotation = 0
 
@@ -18,7 +18,7 @@ class Player(circleshape.CircleShape):
         return [a, b, c]
 
     # Draw a triangle on the screen, coloured white with a line width from constants
-    def draw(self, screen: pygame.Surface):
+    def draw(self, screen: pygame.Surface) -> None:
         pygame.draw.polygon(screen, "white", self.triangle(), constants.LINE_WIDTH)
 
     # Move back and forward
@@ -33,7 +33,7 @@ class Player(circleshape.CircleShape):
     def rotate(self, dt: float) -> None:
         self.rotation += constants.PLAYER_TURN_SPEED * dt
     
-    # Key press for movement
+    # On update, checks if keys have been pressed
     def update(self, dt: float) -> None:
         keys = pygame.key.get_pressed()
 
