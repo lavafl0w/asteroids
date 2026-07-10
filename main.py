@@ -21,13 +21,13 @@ def main() -> None:
     # Internal Components
     py_clock = pygame.time.Clock() # FPS clock
     dt = 0.0 # Delta time - Change in time
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) # Set screen size from constants.py
+    screen: pygame.Surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) # Set screen size from constants.py
     
     # Group Creation
-    updatable = pygame.sprite.Group() # type:ignore
-    drawable = pygame.sprite.Group() # type:ignore
-    asteroids = pygame.sprite.Group() # type:ignore
-    shots = pygame.sprite.Group() # type:ignore
+    updatable = pygame.sprite.Group()
+    drawable = pygame.sprite.Group()
+    asteroids = pygame.sprite.Group()
+    shots = pygame.sprite.Group()
     
     # Group Assignment
     Player.containers = (updatable, drawable) # Player class -> updatable and drawable groups
@@ -37,7 +37,7 @@ def main() -> None:
 
     # Object Creation
     player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
-    field = AsteroidField() # Creates asteroid field # type:ignore
+    field = AsteroidField() # Creates asteroid field
 
     # Game Loop
     while True:
@@ -51,16 +51,24 @@ def main() -> None:
 
         screen.fill("black") # Set background
         
-        for item in drawable: # type:ignore
-            item.draw(screen) # Draw everything in drawable group # type:ignore
+        for item in drawable:
+            item.draw(screen) # Draw everything in drawable group
         
         updatable.update(dt) # Update any movement in updatable group
         
-        for asteroid in asteroids: # type:ignore
-            if asteroid.collides_with(player1) == True: # type:ignore
+        for asteroid in asteroids:
+            # Checks for player/asteroid collision
+            if asteroid.collides_with(player1) == True:
                 log_event("player_hit")
                 print("Game over!")
                 sys.exit()
+                
+            # Checks for any bullet/asteroid collision
+            for bullet in shots:
+                if asteroid.collides_with(bullet) == True:
+                    log_event("asteroid_shot")
+                    bullet.kill()
+                    asteroid.kill()
 
         pygame.display.flip() # Refresh display
         dt = py_clock.tick(60) / 1000 # Ticks at 60 FPS (division of 1000 is for milliseconds)
