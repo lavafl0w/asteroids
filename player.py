@@ -7,6 +7,7 @@ class Player(circleshape.CircleShape):
     def __init__(self, x: float, y:float) -> None:
         super().__init__(x, y, constants.PLAYER_RADIUS)
         self.rotation = 0
+        self.shot_cooldown = 0
 
     # Simply create triangle points
     def triangle(self) -> list[pygame.Vector2]:
@@ -21,7 +22,7 @@ class Player(circleshape.CircleShape):
     def draw(self, screen: pygame.Surface) -> None:
         pygame.draw.polygon(screen, "white", self.triangle(), constants.LINE_WIDTH)
 
-    # On update, checks if keys have been pressed
+    # Things to do every update() call
     def update(self, dt: float) -> None:
         keys = pygame.key.get_pressed()
 
@@ -35,6 +36,8 @@ class Player(circleshape.CircleShape):
             self.rotate(dt)
         if keys[pygame.K_SPACE]: # Shoot - Key: Space
             self.shoot()
+            
+        self.shot_cooldown -= dt # Decreases shot cooldown
         
     # Move back and forward
     def move(self, dt: float) -> None:
@@ -49,8 +52,13 @@ class Player(circleshape.CircleShape):
     
     # Shoot a shot
     def shoot(self) -> None:
-        bullet = shot.Shot(self.position.x, self.position.y) # Create shot
-        bullet_vector = pygame.math.Vector2(0,1) # Creates vector for shot
-        rotated_bullet_vector = bullet_vector.rotate(self.rotation) # Align with player
-        bullet_speed = rotated_bullet_vector * constants.PLAYER_SHOOT_SPEED # Increase speed
-        bullet.velocity = bullet_speed # Apply speed to shot
+        
+        if self.shot_cooldown <= 0:
+            
+            # Create shot
+            bullet = shot.Shot(self.position.x, self.position.y) 
+            # Creates, rotates and increases speed of newly created shot
+            bullet.velocity = pygame.math.Vector2(0,1).rotate(self.rotation) * constants.PLAYER_SHOOT_SPEED
+            # Set shot cooldown to max
+            self.shot_cooldown = constants.PLAYER_SHOT_COOLDOWN_SECONDS
+            
