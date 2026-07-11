@@ -46,6 +46,7 @@ class Player(CircleShape):
         if keys[pygame.K_SPACE]: # Shoot - Key: Space
             self.shoot()
             
+            
         self.shot_cooldown -= dt # Decreases shot cooldown
         
     # Move back and forward
@@ -69,6 +70,8 @@ class Player(CircleShape):
             bullet = Shot(self.position.x, self.position.y) 
             # Creates, rotates and increases speed of newly created shot
             bullet.velocity = pygame.math.Vector2(0,1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
+            # Pew pew pew
+            pygame.mixer.Sound("assets/pew-pew-lame-sound-effect.mp3").play()
             # Set shot cooldown to max
             self.shot_cooldown = PLAYER_SHOT_COOLDOWN_SECONDS
             
