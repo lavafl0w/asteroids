@@ -1,11 +1,18 @@
-import circleshape
-import constants
+from circleshape import CircleShape
+from constants import (
+    LINE_WIDTH,
+    PLAYER_RADIUS,
+    PLAYER_SHOOT_SPEED,
+    PLAYER_SHOT_COOLDOWN_SECONDS,
+    PLAYER_SPEED,
+    PLAYER_TURN_SPEED,
+)
+from shot import Shot
 import pygame
-import shot
 
-class Player(circleshape.CircleShape):
+class Player(CircleShape):
     def __init__(self, x: float, y:float) -> None:
-        super().__init__(x, y, constants.PLAYER_RADIUS)
+        super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.shot_cooldown = 0
 
@@ -20,7 +27,7 @@ class Player(circleshape.CircleShape):
 
     # Draw a triangle on the screen, coloured white with a line width from constants
     def draw(self, screen: pygame.Surface) -> None:
-        pygame.draw.polygon(screen, "white", self.triangle(), constants.LINE_WIDTH)
+        pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
 
     # Things to do every update() call
     def update(self, dt: float) -> None:
@@ -43,12 +50,12 @@ class Player(circleshape.CircleShape):
     def move(self, dt: float) -> None:
         unit_vector = pygame.math.Vector2(0,1) # Creates a unit vector of length 1
         rotated_vector = unit_vector.rotate(self.rotation) # Rotates vector in same direction of player
-        speed_vector = rotated_vector * constants.PLAYER_SPEED * dt # Extends the length of the vector by how much the player should move in frame
+        speed_vector = rotated_vector * PLAYER_SPEED * dt # Extends the length of the vector by how much the player should move in frame
         self.position += speed_vector # Makes this the new position
         
     # Rotates player sprite
     def rotate(self, dt: float) -> None:
-        self.rotation += constants.PLAYER_TURN_SPEED * dt
+        self.rotation += PLAYER_TURN_SPEED * dt
     
     # Shoot a shot
     def shoot(self) -> None:
@@ -56,9 +63,9 @@ class Player(circleshape.CircleShape):
         if self.shot_cooldown <= 0:
             
             # Create shot
-            bullet = shot.Shot(self.position.x, self.position.y) 
+            bullet = Shot(self.position.x, self.position.y) 
             # Creates, rotates and increases speed of newly created shot
-            bullet.velocity = pygame.math.Vector2(0,1).rotate(self.rotation) * constants.PLAYER_SHOOT_SPEED
+            bullet.velocity = pygame.math.Vector2(0,1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
             # Set shot cooldown to max
-            self.shot_cooldown = constants.PLAYER_SHOT_COOLDOWN_SECONDS
+            self.shot_cooldown = PLAYER_SHOT_COOLDOWN_SECONDS
             

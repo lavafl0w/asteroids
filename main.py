@@ -1,13 +1,14 @@
-import pygame
-import sys
-
+# INTERNAL COMPONENT IMPORTS
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_state, log_event
-
+# CLASS IMPORTS
 from player import Player
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from shot import Shot
+# SYSTEM IMPORTS
+import pygame
+import sys
 
 def main() -> None:
 
@@ -33,7 +34,7 @@ def main() -> None:
     Player.containers = (updatable, drawable) # Player class -> updatable and drawable groups
     Asteroid.containers = (updatable, drawable, asteroids) # Astroid class -> updatable, drawable and asteroids
     AsteroidField.containers = (updatable) # AstroidField class -> updatable
-    Shot.containers = (updatable, drawable, shots)
+    Shot.containers = (updatable, drawable, shots) # Shot class -> updatable, drawable, shots
 
     # Object Creation
     player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
