@@ -15,6 +15,7 @@ ASTEROID_KINDS = 3
 ASTEROID_SPAWN_RATE_SECONDS = 0.8
 ASTEROID_MAX_RADIUS = ASTEROID_MIN_RADIUS * ASTEROID_KINDS
 
+# Possible extension point: future powerup tuning values would fit naturally near these gameplay constants.
 # OTHER ELEMENTS
 SHOT_RADIUS = 5
 LINE_WIDTH = 2

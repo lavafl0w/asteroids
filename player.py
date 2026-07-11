@@ -15,6 +15,7 @@ class Player(CircleShape):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.shot_cooldown = 0
+        # Possible extension point: temporary player effects can live alongside the usual player state.
 
     # Simply create triangle points
     def triangle(self) -> list[pygame.Vector2]:
@@ -32,6 +33,7 @@ class Player(CircleShape):
     # Things to do every update() call
     def update(self, dt: float) -> None:
         keys = pygame.key.get_pressed()
+        # Future powerup hook: timed effects can be maintained as part of the normal frame update.
 
         if keys[pygame.K_w]: # Move forward - Key: W
             self.move(dt)
@@ -48,6 +50,7 @@ class Player(CircleShape):
         
     # Move back and forward
     def move(self, dt: float) -> None:
+        # Possible extension point: movement is a natural place for temporary speed-related effects.
         unit_vector = pygame.math.Vector2(0,1) # Creates a unit vector of length 1
         rotated_vector = unit_vector.rotate(self.rotation) # Rotates vector in same direction of player
         speed_vector = rotated_vector * PLAYER_SPEED * dt # Extends the length of the vector by how much the player should move in frame

@@ -21,6 +21,7 @@ class Asteroid(CircleShape):
     # Handles splitting of asteroids into smaller/fastrr ones when hit    
     def split(self) -> None:
         self.kill() # Regardless of size, this asteroid should be destroyed first
+        # Possible extension point: asteroid removal is a natural moment to consider future drop behavior.
         
         # This was a small asteroid so do nothing
         if self.radius <= ASTEROID_MIN_RADIUS:

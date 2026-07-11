@@ -16,8 +16,12 @@ def main() -> None:
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
 
-    # Create Pygame Instance
+    # Create Pygame instance, enables fonts
     pygame.init()
+    pygame.font.init()
+        
+    # Set up font for display
+    font = pygame.font.SysFont(None, 36)
 
     # Internal Components
     py_clock = pygame.time.Clock() # FPS clock
@@ -29,6 +33,7 @@ def main() -> None:
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
+    # Possible extension point: collectible pickups may want their own sprite group in this setup.
     
     # Group Assignment
     Player.containers = (updatable, drawable) # Player class -> updatable and drawable groups
@@ -39,6 +44,9 @@ def main() -> None:
     # Object Creation
     player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
     field = AsteroidField() # Creates asteroid field
+    # Future powerup hook: lightweight HUD resources or pickup systems could be introduced around this setup stage.
+        
+
 
     # Game Loop
     while True:
@@ -52,12 +60,18 @@ def main() -> None:
 
         screen.fill("black") # Set background
         
+        # Creates a font screen of what text to render
+        font_screen = font.render("Hello (not) world!", True, (255,255,255))
+        screen.blit(font_screen, (10,10)) # Apply that to the main screen
+        
         for item in drawable:
             item.draw(screen) # Draw everything in drawable group
+        # Possible extension point: simple HUD rendering can happen around the main draw pass.
         
         updatable.update(dt) # Update any movement in updatable group
         
         for asteroid in asteroids:
+            # Future powerup hook: protected-hit handling and pickup collisions can slot into this collision section.
             # Checks for player/asteroid collision
             if asteroid.collides_with(player1) == True:
                 log_event("player_hit")
