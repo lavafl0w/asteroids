@@ -16,12 +16,17 @@ def main() -> None:
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
 
-    # Create Pygame instance, enables fonts
+    # Start Pygame instance, enables fonts and music
     pygame.init()
     pygame.font.init()
+    pygame.mixer.init()
         
     # Set up font for display
     font = pygame.font.SysFont(None, 36)
+    
+    # Load music track
+    music = pygame.mixer.music
+    music.load('assets/music_g_m.mp3')
 
     # Internal Components
     py_clock = pygame.time.Clock() # FPS clock
@@ -45,8 +50,6 @@ def main() -> None:
     player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
     field = AsteroidField() # Creates asteroid field
     # Future powerup hook: lightweight HUD resources or pickup systems could be introduced around this setup stage.
-        
-
 
     # Game Loop
     while True:
@@ -57,6 +60,10 @@ def main() -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
+
+        # If music isn't playing, start it // if music is already playing, skip
+        if music.get_busy() == False:
+            music.play()
 
         screen.fill("black") # Set background
         
