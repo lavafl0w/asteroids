@@ -9,6 +9,10 @@ wheels/
 # Virtual environments
 .venv/
 
-# User Files
+# Log Files
 game_state.jsonl
 game_events.jsonl
+
+# Remove .md notes, keeping readme.me
+*.md
+!README.md
