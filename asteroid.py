@@ -1,6 +1,7 @@
 from logger import log_event
 from circleshape import CircleShape
 from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH
+from powerups import * #!
 
 import pygame
 import random
@@ -18,13 +19,18 @@ class Asteroid(CircleShape):
     def update(self, dt: float) -> None:
         self.position += (self.velocity * dt)
     
-    # Handles splitting of asteroids into smaller/fastrr ones when hit    
+    # Handles splitting of asteroids into smaller/faster ones when hit    
     def split(self) -> None:
         self.kill() # Regardless of size, this asteroid should be destroyed first
-        # Possible extension point: asteroid removal is a natural moment to consider future drop behavior.
         
-        # This was a small asteroid so do nothing
+        # This was a small asteroid
         if self.radius <= ASTEROID_MIN_RADIUS:
+            
+            # This is where the powerup logic will live
+            if random.randrange(0, 100) < BOMB_SPAWN_CHANCE: # If this should be a bomb
+                Bomb(self.position.x, self.position.y)
+                return # Return after so multiple powerups don't spawn
+            
             return
         
         log_event("asteroid_split")
