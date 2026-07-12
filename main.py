@@ -88,7 +88,8 @@ def main() -> None:
         for asteroid in asteroids:
             # NOTE: Future powerup hook: protected-hit handling and pickup collisions can slot into this collision section.
             # Checks for player/asteroid collision
-            if asteroid.collides_with(player1):
+            #! Remember and remove this block comment lol
+            '''if asteroid.collides_with(player1):
                 log_event("player_hit")
                 print("Game over!")
                 
@@ -99,17 +100,20 @@ def main() -> None:
                 # Wait for death sound to finish then exit
                 pygame.time.wait(int(death_snd_effect.get_length()*1000))
                 sys.exit()
-                
+            '''    
             # Checks for any bullet/asteroid collision
             for bullet in shots:
                 if asteroid.collides_with(bullet):
                     log_event("asteroid_shot")
                     bullet.kill() # Remove bullet object                    
                     asteroid.split() # Call asteroid split logic
-
+                    
+            # TODO: This is where the expanding bomb radius circle would live
+            # asteroid.collides_with(bomb_boom) then kill asteroid
+            
         for item in powerups:
             if item.collides_with(player1):
-                item.activated = True
+                item.activate()
 
         pygame.display.flip() # Refresh display
         dt = py_clock.tick(60) / 1000 # Ticks at 60 FPS (division of 1000 is for milliseconds)
