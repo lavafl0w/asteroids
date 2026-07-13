@@ -45,14 +45,16 @@ def main() -> None:
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
     powerups = pygame.sprite.Group()
+    bomb_explosion = pygame.sprite.Group()
     
     # Group Assignment
     Player.containers = (updatable, drawable) # Player class -> updatable and drawable groups
     Asteroid.containers = (updatable, drawable, asteroids) # Astroid class -> updatable, drawable and asteroids
     AsteroidField.containers = (updatable) # AstroidField class -> updatable
     Shot.containers = (updatable, drawable, shots) # Shot class -> updatable, drawable, shots
-    #Font.containers = (drawable) #? Can the font class be added to drawable container? Then it can be used to update and draw...
-    Bomb.containers = (updatable, drawable, powerups) # Bomb class -> updatable, drawbale, powerups
+    #Font.containers = (updatable, drawable) #? Can the font class be added to drawable container? Then it can be used to update and draw...
+    Bomb.containers = (updatable, drawable, powerups) # Bomb class -> updatable, drawable, powerups
+    BombExplosion.containers = (updatable, drawable, bomb_explosion)
     
     # Object Creation
     player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
@@ -62,31 +64,35 @@ def main() -> None:
     # Game Loop
     while True:
 
-        log_state() # Start logger
+        # Initialise Logger
+        log_state()
 
         # This makes the close button on the window work
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
 
-        screen.fill("black") # Set background
-        
-        # Creates a font screen of what text will be rendered
+        # Background set
+        screen.fill("black")
+                
+        # Creates a font screen of text to be rendered
         font_screen = font.render("Hello (not) world!", True, (255,255,255))
         screen.blit(font_screen, (10,10)) # Apply that to the main screen
         
-        # NOTE: Font screen should be a list of tuples (screen, position) that can then be used by screen.blits(font_screen)
+        # NOTE: If using screen.blits(font_screen), font screen should be a list of tuples (screen, position)
         #font_screen = [(font.render("Hello (not) world!", True, (255,255,255)), (10,10)), (font.render("#################", True, (255,255,255)), (20,20))]
         #screen.blits(font_screen)
         
+        # Draw everything on screen that can be drawn
         for item in drawable:
-            item.draw(screen) # Draw everything in drawable group
-        # TODO: Could add the font screen into the drawable group, and if item is a list, use screen.blits
+            item.draw(screen)
+        # FUTURE: Could add the font screen into the drawable group, and if item is a list, use screen.blits
         
-        updatable.update(dt) # Update any movement in updatable group
-      
+        # Update all things updatable with the time since last frame (dt)
+        updatable.update(dt)
+
+        # GAME EVENTS #
         for asteroid in asteroids:
-            # NOTE: Future powerup hook: protected-hit handling and pickup collisions can slot into this collision section.
             # Checks for player/asteroid collision
             #! Remember and remove this block comment lol
             '''if asteroid.collides_with(player1):
@@ -107,14 +113,20 @@ def main() -> None:
                     log_event("asteroid_shot")
                     bullet.kill() # Remove bullet object                    
                     asteroid.split() # Call asteroid split logic
-                    
-            # TODO: This is where the expanding bomb radius circle would live
-            # asteroid.collides_with(bomb_boom) then kill asteroid
             
+            # Checks for any bomb_explosion/asteroid collision
+            for explosion in bomb_explosion:
+                if asteroid.collides_with(explosion):
+                    asteroid.kill()
+                    # FUTURE: To add further into keeping score mechanic, this could be different score because it was a bomb
+                    # FUTURE: and at the end have something like "Bombs used:" "Asteroids destroyed by bombs:"
+        
+        # Checks for any item/powerup collision with player i.e player has picked something up
         for item in powerups:
             if item.collides_with(player1):
                 item.activate()
 
+        # After all events/checks are done
         pygame.display.flip() # Refresh display
         dt = py_clock.tick(60) / 1000 # Ticks at 60 FPS (division of 1000 is for milliseconds)
 

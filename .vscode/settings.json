@@ -1,7 +1,10 @@
 {
     "cSpell.words": [
         "asteroidfield",
+        "blit",
+        "blits",
         "circleshape",
         "COOLDOWN"
-    ]
+    ],
+    "todo-tree.tree.scanMode": "workspace only"
 }
