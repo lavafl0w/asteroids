@@ -33,7 +33,7 @@ class Player(CircleShape):
     # Things to do every update() call
     def update(self, dt: float) -> None:
         keys = pygame.key.get_pressed()
-        # Future powerup hook: timed effects can be maintained as part of the normal frame update.
+        # Note: Future powerup hook: timed effects can be maintained as part of the normal frame update.
 
         if keys[pygame.K_w]: # Move forward - Key: W
             self.move(dt)

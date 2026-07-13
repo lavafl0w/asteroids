@@ -26,13 +26,17 @@ def main() -> None:
     font = pygame.font.SysFont(None, 36)
     
     # Load music track and play infinitely (-1)
+    # FUTURE: call an overall sound effect assignment for music, sound effects and group assignment (?)
     music = pygame.mixer.music
     music.load('assets/music_g_m.mp3')
     music.play(-1)
     
     # Sound effects
+    # FUTURE: //
     sound_effect = pygame.mixer.Sound
     death_snd_effect = sound_effect("assets/emotional_damage.mp3")
+    Bomb.explosion_sound = sound_effect("assets/explosion.mp3")
+    Bomb.explosion_sound.set_volume(0.20) 
 
     # Internal Components
     py_clock = pygame.time.Clock() # FPS clock
@@ -48,6 +52,7 @@ def main() -> None:
     bomb_explosion = pygame.sprite.Group()
     
     # Group Assignment
+    # FUTURE: //
     Player.containers = (updatable, drawable) # Player class -> updatable and drawable groups
     Asteroid.containers = (updatable, drawable, asteroids) # Astroid class -> updatable, drawable and asteroids
     AsteroidField.containers = (updatable) # AstroidField class -> updatable
