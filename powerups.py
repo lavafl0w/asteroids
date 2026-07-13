@@ -53,21 +53,22 @@ class ItemPickup(CircleShape):
 
 class Bomb(ItemPickup):
     explosion_sound: pygame.mixer.Sound | None = None # Start bomb with no sound effect until after mixer is initialised
+    width = 40
+    height = 25
     
     def __init__(self, x:float, y:float) -> None:
         super().__init__(x, y, SHOT_RADIUS) #! This shot radius needs changed to incorportate the hitbox of the bomb
         self.detonate_timer = BOMB_DETONATE_TIME
-        self.width = 40
-        self.height = 25
+
         
-    def draw_bomb(self) -> pygame.Rect:        
+    def bomb_rect(self) -> pygame.Rect:        
         bomb = pygame.Rect(0, 0, self.width, self.height)
         bomb.center = (int(self.position.x), int(self.position.y))
         return bomb
         
     def draw(self, screen: pygame.Surface) -> None:
         if self.visible:
-            pygame.draw.rect(screen, self.color, self.draw_bomb())
+            pygame.draw.rect(screen, self.color, self.bomb_rect())
     
     # Call general activate function and set despawn time to 3
     def activate(self) -> bool:

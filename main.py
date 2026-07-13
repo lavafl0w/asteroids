@@ -1,6 +1,7 @@
 # INTERNAL COMPONENT IMPORTS
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_state, log_event
+from collisions import * #!
 # CLASS IMPORTS
 from player import Player
 from asteroid import Asteroid
@@ -112,23 +113,29 @@ def main() -> None:
                 pygame.time.wait(int(death_snd_effect.get_length()*1000))
                 sys.exit()
             '''    
+
+            if player_circle_collision(player1.triangle(), asteroid):
+                print("crash!!")
+
+            
             # Checks for any bullet/asteroid collision
             for bullet in shots:
-                if asteroid.collides_with(bullet):
+                if circle_circle_collision(asteroid, bullet):
                     log_event("asteroid_shot")
                     bullet.kill() # Remove bullet object                    
                     asteroid.split() # Call asteroid split logic
             
             # Checks for any bomb_explosion/asteroid collision
             for explosion in bomb_explosion:
-                if asteroid.collides_with(explosion):
+                if circle_circle_collision(asteroid, explosion):
                     asteroid.kill()
                     # FUTURE: To add further into keeping score mechanic, this could be different score because it was a bomb
                     # FUTURE: and at the end have something like "Bombs used:" "Asteroids destroyed by bombs:"
         
         # Checks for any item/powerup collision with player i.e player has picked something up
         for item in powerups:
-            if item.collides_with(player1):
+            #! Right now player is still circle hitbox
+            if circle_rect_collision(player1, item.bomb_rect()):
                 item.activate()
 
         # After all events/checks are done
