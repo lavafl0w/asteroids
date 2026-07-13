@@ -64,14 +64,21 @@ def main() -> None:
     
     # Object Creation
     player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
-    field = AsteroidField() # Creates asteroid field
+    #field = AsteroidField() # Creates asteroid field
+    test_asteroid = Asteroid(700, 350, 40)
+    test_asteroid.velocity = pygame.Vector2(0,0)
     # NOTE: Future powerup hook: lightweight HUD resources or pickup systems could be introduced around this setup stage.
+
+    DEBUG = True
 
     # Game Loop
     while True:
 
         # Initialise Logger
         log_state()
+
+        # Debugging
+        debug_data = {} if DEBUG == True else None
 
         # This makes the close button on the window work
         for event in pygame.event.get():
@@ -88,11 +95,6 @@ def main() -> None:
         # NOTE: If using screen.blits(font_screen), font screen should be a list of tuples (screen, position)
         #font_screen = [(font.render("Hello (not) world!", True, (255,255,255)), (10,10)), (font.render("#################", True, (255,255,255)), (20,20))]
         #screen.blits(font_screen)
-        
-        # Draw everything on screen that can be drawn
-        for item in drawable:
-            item.draw(screen)
-        # FUTURE: Could add the font screen into the drawable group, and if item is a list, use screen.blits
         
         # Update all things updatable with the time since last frame (dt)
         updatable.update(dt)
@@ -114,8 +116,9 @@ def main() -> None:
                 sys.exit()
             '''    
 
-            if player_circle_collision(player1.triangle(), asteroid):
-                print("crash!!")
+            debug = player_circle_collision(player1.triangle(), asteroid, debug_data)
+            #if debug:
+             #   print("crash!!")
 
             
             # Checks for any bullet/asteroid collision
@@ -137,10 +140,28 @@ def main() -> None:
             #! Right now player is still circle hitbox
             if circle_rect_collision(player1, item.bomb_rect()):
                 item.activate()
+        
+        # Draw everything on screen that can be drawn
+        for item in drawable:
+            item.draw(screen)
+        # FUTURE: Could add the font screen into the drawable group, and if item is a list, use screen.blits
+       
+        draw_debug(screen, debug_data)
 
         # After all events/checks are done
         pygame.display.flip() # Refresh display
         dt = py_clock.tick(60) / 1000 # Ticks at 60 FPS (division of 1000 is for milliseconds)
+
+def draw_debug(screen: pygame.Surface, debug_data:dict | None):
+    if debug_data is None:
+        return
+    for _ in debug_data.items():
+        for item in debug_data["points"]:
+            pygame.draw.circle(screen, "green", item, 3)
+        #for item in debug_data["edge"]:
+        pygame.draw.circle(screen, "orange", debug_data["closest"], 3)
+        pygame.draw.line(screen, "red", debug_data["centre"], debug_data["closest"], 3)
+    
 
 if __name__ == "__main__":
     main()

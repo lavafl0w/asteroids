@@ -26,7 +26,7 @@ def circle_rect_collision(circle: CircleShape, rect:pygame.Rect) -> bool:
     # This takes the center position of the circle, and finds the closest point within the bounds of the Rect
     # If circle x is left of Rect - use that.. right of Rect - use that, somewhere in the middle, circle x
     closest_x = max(rect.left, min(circle.position.x, rect.right))
-    closest_y = max(rect.bottom, min(circle.position.y, rect.top))
+    closest_y = max(rect.top, min(circle.position.y, rect.bottom))
     
     # Get the distance from the centre of the circle to the closest points
     circle_coords_dist = pygame.math.Vector2.distance_to(circle.position, (closest_x, closest_y))
@@ -36,27 +36,32 @@ def circle_rect_collision(circle: CircleShape, rect:pygame.Rect) -> bool:
         return True
     return False
 
-def player_circle_collision(player: list[pygame.Vector2], circle: CircleShape) -> bool:
+def player_circle_collision(player: list[pygame.Vector2], circle: CircleShape, debug: dict | None) -> bool:
     '''
     Nose > Back Left
     Nose > Back Right
     Back Left > Back Right
-    check closest x, y with circle on each edge
-    Nose = (1,1)
-    BL = (2,0)
-    BR = (0,0)
     
-    edges = [[(0,0), (1,1)], [(1,1), (2,0)], [(0,0), (2,0)]]
+    0>1
+    0>2
+    1>2
     
     '''
     
     edges = [[player[1], player[0]], [player[0], player[2]], [player[1], player[2]]]
-    
+    if debug is not None:
+        debug["points"] = [player[0], player[1], player[2]]
+
     for edge in edges:
         closest_x = max(edge[0][0], min(circle.position.x, edge[1][0]))
         closest_y = max(edge[0][1], min(circle.position.y, edge[1][1]))
         circle_coords_dist = pygame.math.Vector2.distance_to(circle.position, (closest_x, closest_y))
-        
+        if debug is not None:
+            #debug[f"edge"] = [circle.position, (closest_x, closest_y)]
+            if "dist" not in debug or debug["dist"] > circle_coords_dist:
+                debug["dist"] = circle_coords_dist        
+                debug["closest"] = (closest_x, closest_y)               
+            debug["centre"] = circle.position
         if circle_coords_dist <= circle.radius:
             return True
     return False
