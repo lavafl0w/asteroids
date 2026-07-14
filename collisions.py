@@ -1,22 +1,54 @@
-from circleshape import CircleShape
+from typing import cast
+from circleshape import CircleShape, TriangleShape
 import pygame
 import logger
 
 # COLLISION LOGIC #
 
+# Master Collision Check / Router
+def collides(shape_1: CircleShape, shape_2: CircleShape) -> bool:
+    '''
+    This is the collision check dispatcher to keep things simple.
+    For now, pass arguments in one of the supported orders:
+    triangle -> circle, triangle -> rect, circle -> circle, or circle -> rect.
+    '''
+    match shape_1.hitbox_kind, shape_2.hitbox_kind:
+        case "circle", "circle":
+            return circle_overlaps_circle(
+                cast(CircleShape, shape_1.hitbox_shape()),
+                cast(CircleShape, shape_2.hitbox_shape()),
+            )
+        case "circle", "rect":
+            return circle_overlaps_rect(
+                cast(CircleShape, shape_1.hitbox_shape()),
+                cast(pygame.Rect, shape_2.hitbox_shape()),
+            )
+        case "triangle", "circle":
+            return triangle_overlaps_circle(
+                cast(TriangleShape, shape_1.hitbox_shape()),
+                cast(CircleShape, shape_2.hitbox_shape()),
+            )
+        case "triangle", "rect":
+            return triangle_overlaps_rect(
+                cast(TriangleShape, shape_1.hitbox_shape()),
+                cast(pygame.Rect, shape_2.hitbox_shape()),
+            )
+        case _:
+            raise NotImplementedError(f"Collision case not found for object_1: {shape_1.__class__.__name__} and object_2: {shape_2.__class__.__name__}")
+    
 # Bomb Explosion / Asteroid
-def circle_circle_collision(me: CircleShape, other: CircleShape) -> bool:
+def circle_overlaps_circle(circle_1: CircleShape, circle_2: CircleShape) -> bool:
     # Calculate distance between center of each CircleShape object
-    center_distances = pygame.math.Vector2.distance_to(me.position, other.position)
+    center_distances = pygame.math.Vector2.distance_to(circle_1.position, circle_2.position)
     
     # When distance between center points is the same or less than both radius's put together --- return true
-    if center_distances <= (me.radius + other.radius):
+    if center_distances <= (circle_1.radius + circle_2.radius):
         return True
         
     return False
 
-# Not used rn
-def circle_rect_collision(circle: CircleShape, rect:pygame.Rect) -> bool: 
+# Not used currently
+def circle_overlaps_rect(circle: CircleShape, rect:pygame.Rect) -> bool: 
     # This takes the center position of the circle, and finds the closest point within the bounds of the Rect
     # If circle x is left of Rect - use that.. right of Rect - use that, somewhere in the middle, circle x
     closest_x = max(rect.left, min(circle.position.x, rect.right))
@@ -31,7 +63,8 @@ def circle_rect_collision(circle: CircleShape, rect:pygame.Rect) -> bool:
     return False
 
 # Player / Asteroid
-def player_circle_collision(player: list[pygame.Vector2], circle: CircleShape, debug: dict | None) -> bool:
+def triangle_overlaps_circle(player: TriangleShape, circle: CircleShape) -> bool:
+    # FUTURE: Asteroid centre inside player
     '''
     Checks whether a circular object overlaps any edge of the player triangle.
 
@@ -67,7 +100,8 @@ def player_circle_collision(player: list[pygame.Vector2], circle: CircleShape, d
     return False
 
 # Player / Item
-def player_rect_collision(player: list[pygame.Vector2], rect: pygame.Rect, debug: dict | None) -> bool:
+def triangle_overlaps_rect(player: TriangleShape, rect: pygame.Rect) -> bool:
+    # FUTURE: Rect fully inside triangle
     # For each point of the player, check if it's inside the rectangle
     for point in player:
         if rect.collidepoint(point):

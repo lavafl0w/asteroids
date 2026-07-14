@@ -1,4 +1,4 @@
-from circleshape import CircleShape
+from circleshape import CircleShape, TriangleShape
 from constants import (
     LINE_WIDTH,
     PLAYER_RADIUS,
@@ -15,16 +15,17 @@ class Player(CircleShape):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.shot_cooldown = 0
+        self.hitbox_kind = "triangle"
         # Possible extension point: temporary player effects can live alongside the usual player state.
 
     # Simply create triangle points
-    def triangle(self) -> list[pygame.Vector2]:
+    def triangle(self) -> TriangleShape:
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
         nose = self.position + forward * self.radius
         back_right = self.position - forward * self.radius - right
         back_left = self.position - forward * self.radius + right
-        return [nose, back_left, back_right]
+        return (nose, back_left, back_right)
 
     # Draw a triangle on the screen, coloured white with a line width from constants
     def draw(self, screen: pygame.Surface) -> None:
@@ -74,4 +75,7 @@ class Player(CircleShape):
             pygame.mixer.Sound("assets/pew-pew-lame-sound-effect.mp3").play()
             # Set shot cooldown to max
             self.shot_cooldown = PLAYER_SHOT_COOLDOWN_SECONDS
+            
+    def hitbox_shape(self) -> TriangleShape:
+        return self.triangle()
             

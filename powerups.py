@@ -5,13 +5,14 @@ from logger import log_event
 
 # PARENT ITEM CLASS #
 class ItemPickup(CircleShape):
-    def __init__(self, x:float, y:float, radius:float) -> None:
-        super().__init__(x, y, radius)
+    def __init__(self, x:float, y:float) -> None:
+        super().__init__(x, y, radius = 0)
         self.time_until_despawn = TIME_UNTIL_ITEM_DESPAWN
         self.activated = False
         self.flash_timer = 0.0
         self.color = "white"
         self.visible = True
+        self.hitbox_kind = "rect"
     
     # Helper for if item has been activated    
     def activate(self) -> bool:
@@ -50,6 +51,12 @@ class ItemPickup(CircleShape):
 
         # Getting closer, it's gonna despawn!
         self.update_warning_flash(dt, "yellow")
+        
+    def item_rect(self) -> pygame.Rect:
+        raise NotImplementedError(f"{self.__class__.__name__} hasn't implemented an item_rect method")
+        
+    def hitbox_shape(self) -> pygame.Rect:
+        return self.item_rect()
 
 class Bomb(ItemPickup):
     explosion_sound: pygame.mixer.Sound | None = None # Start bomb with no sound effect until after mixer is initialised
@@ -57,18 +64,17 @@ class Bomb(ItemPickup):
     height = 25
     
     def __init__(self, x:float, y:float) -> None:
-        super().__init__(x, y, SHOT_RADIUS) #! This shot radius needs changed to incorportate the hitbox of the bomb
+        super().__init__(x, y)
         self.detonate_timer = BOMB_DETONATE_TIME
-
         
-    def bomb_rect(self) -> pygame.Rect:        
+    def item_rect(self) -> pygame.Rect:        
         bomb = pygame.Rect(0, 0, self.width, self.height)
         bomb.center = (int(self.position.x), int(self.position.y))
         return bomb
         
     def draw(self, screen: pygame.Surface) -> None:
         if self.visible:
-            pygame.draw.rect(screen, self.color, self.bomb_rect())
+            pygame.draw.rect(screen, self.color, self.item_rect())
     
     # Call general activate function and set despawn time to 3
     def activate(self) -> bool:
@@ -120,4 +126,3 @@ class BombExplosion(CircleShape):
             BombExplosion(self.position.x, self.position.y, self.radius + 1, self.time_left)    
         
         self.kill() # Kill this instance
-

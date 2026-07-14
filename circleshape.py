@@ -14,6 +14,7 @@ class CircleShape(pygame.sprite.Sprite):
         self.position: pygame.Vector2 = pygame.Vector2(x, y)
         self.velocity = pygame.Vector2(0, 0)
         self.radius = radius
+        self.hitbox_kind = "circle"
 
     def draw(self, screen: pygame.Surface) -> None:
         # must override
@@ -22,14 +23,9 @@ class CircleShape(pygame.sprite.Sprite):
     def update(self, dt: float) -> None:
         # must override
         pass
+        
+    def hitbox_shape(self) -> "HitboxShape":
+        return self
     
-    # Collision logic
-    def collides_with(self, other: "CircleShape") -> bool:
-        # Calculate distance between center of each CircleShape object
-        center_distances = pygame.math.Vector2.distance_to(self.position, other.position)
-        
-        # When distance between center points is the same or less than both radius's put together --- return true
-        if center_distances <= (self.radius + other.radius):
-            return True
-        
-        return False
+TriangleShape = tuple[pygame.Vector2, pygame.Vector2, pygame.Vector2]
+HitboxShape = CircleShape | pygame.Rect | TriangleShape

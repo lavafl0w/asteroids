@@ -2,7 +2,7 @@
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_state, log_event
 from debug import draw_debug
-from collisions import * #!
+from collisions import collides
 # CLASS IMPORTS
 from player import Player
 from asteroid import Asteroid
@@ -105,7 +105,7 @@ def main() -> None:
             # Checks for player/asteroid collision
             #! Remember and remove this block comment lol
             '''
-            if player_circle_collision(player1.triangle(), asteroid, debug_data):
+            if collides(player1, asteroid):
                 log_event("player_hit")
                 print("Game over!")
                 
@@ -119,21 +119,21 @@ def main() -> None:
             '''                
             # Checks for any bullet/asteroid collision
             for bullet in shots:
-                if circle_circle_collision(asteroid, bullet):
+                if collides(asteroid, bullet):
                     log_event("asteroid_shot")
                     bullet.kill() # Remove bullet object                    
                     asteroid.split() # Call asteroid split logic
             
             # Checks for any bomb_explosion/asteroid collision
             for explosion in bomb_explosion:
-                if circle_circle_collision(asteroid, explosion):
+                if collides(asteroid, explosion):
                     asteroid.kill()
                     # FUTURE: To add further into keeping score mechanic, this could be different score because it was a bomb
                     # FUTURE: and at the end have something like "Bombs used:" "Asteroids destroyed by bombs:"
         
         # Checks for any item/powerup collision with player i.e player has picked something up
         for item in powerups:
-            if player_rect_collision(player1.triangle(), item.bomb_rect(), debug_data):
+            if collides(player1, item):
                 item.activate()
         
         # Draw everything on screen that can be drawn
@@ -142,7 +142,7 @@ def main() -> None:
         # FUTURE: Could add the font screen into the drawable group, and if item is a list, use screen.blits
         
         # NOTE: Draw debug data       
-        draw_debug(screen, debug_data)
+        #draw_debug(screen, debug_data)
 
         # After all events/checks are done
         pygame.display.flip() # Refresh display
