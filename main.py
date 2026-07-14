@@ -3,6 +3,7 @@ from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_state, log_event
 from debug import draw_debug
 from collisions import collides
+import debug_flags
 # CLASS IMPORTS
 from player import Player
 from asteroid import Asteroid
@@ -66,8 +67,10 @@ def main() -> None:
     # Object Creation
     player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
     field = AsteroidField() # Creates asteroid field
-    #//debug_asteroid = Asteroid(700, 350, 40)
-    #//debug_asteroid.velocity = pygame.Vector2(0,0)
+    if debug_flags.check('ONLY_DRAW_SINGLE_ASTEROID'):
+        field.kill()
+        debug_asteroid = Asteroid(700, 350, 40)
+        debug_asteroid.velocity = pygame.Vector2(0,0)
     # NOTE: Future powerup hook: lightweight HUD resources or pickup systems could be introduced around this setup stage.
 
     #//DEBUG = True
@@ -103,7 +106,7 @@ def main() -> None:
         # GAME EVENTS #
         for asteroid in asteroids:
             # Checks for player/asteroid collision
-            if collides(player1, asteroid):
+            if collides(player1, asteroid) and not debug_flags.check('DISABLE_PLAYER_ASTEROID_HIT'):
                 log_event("player_hit")
                 print("Game over!")
                 

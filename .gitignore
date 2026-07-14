@@ -12,6 +12,7 @@ wheels/
 # Log Files
 game_state.jsonl
 game_events.jsonl
+debug_flags_local.py
 
 # Remove .md notes, keeping readme.me
 *.md
