@@ -65,9 +65,9 @@ def main() -> None:
     
     # Object Creation
     player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
-    #field = AsteroidField() # Creates asteroid field
-    test_asteroid = Asteroid(700, 350, 40)
-    test_asteroid.velocity = pygame.Vector2(0,0)
+    field = AsteroidField() # Creates asteroid field
+    #debug_asteroid = Asteroid(700, 350, 40)
+    #debug_asteroid.velocity = pygame.Vector2(0,0)
     # NOTE: Future powerup hook: lightweight HUD resources or pickup systems could be introduced around this setup stage.
 
     DEBUG = False
@@ -104,7 +104,8 @@ def main() -> None:
         for asteroid in asteroids:
             # Checks for player/asteroid collision
             #! Remember and remove this block comment lol
-            '''if asteroid.collides_with(player1):
+            '''
+            if player_circle_collision(player1.triangle(), asteroid, debug_data):
                 log_event("player_hit")
                 print("Game over!")
                 
@@ -132,8 +133,7 @@ def main() -> None:
         
         # Checks for any item/powerup collision with player i.e player has picked something up
         for item in powerups:
-            #! Right now player is still circle hitbox
-            if circle_rect_collision(player1, item.bomb_rect()):
+            if player_rect_collision(player1.triangle(), item.bomb_rect(), debug_data):
                 item.activate()
         
         # Draw everything on screen that can be drawn
@@ -141,7 +141,7 @@ def main() -> None:
             item.draw(screen)
         # FUTURE: Could add the font screen into the drawable group, and if item is a list, use screen.blits
         
-        #! Draw debug data       
+        # NOTE: Draw debug data       
         draw_debug(screen, debug_data)
 
         # After all events/checks are done

@@ -1,16 +1,10 @@
 from circleshape import CircleShape
 import pygame
 import logger
-'''
-So this needs to be called when: (all shapes are class Rect)
 
-bullet > asteroid (circle/circle)
-player > asteroid (triangle/circle)
-player > pickup (triangle/rect)
-explosion > asteroid (circle/circle)
-'''
+# COLLISION LOGIC #
 
-# Collision logic
+# Bomb Explosion / Asteroid
 def circle_circle_collision(me: CircleShape, other: CircleShape) -> bool:
     # Calculate distance between center of each CircleShape object
     center_distances = pygame.math.Vector2.distance_to(me.position, other.position)
@@ -21,7 +15,7 @@ def circle_circle_collision(me: CircleShape, other: CircleShape) -> bool:
         
     return False
 
-# Currently going to use this for player/bomb until I work out player being a triangle
+# Not used rn
 def circle_rect_collision(circle: CircleShape, rect:pygame.Rect) -> bool: 
     # This takes the center position of the circle, and finds the closest point within the bounds of the Rect
     # If circle x is left of Rect - use that.. right of Rect - use that, somewhere in the middle, circle x
@@ -36,6 +30,7 @@ def circle_rect_collision(circle: CircleShape, rect:pygame.Rect) -> bool:
         return True
     return False
 
+# Player / Asteroid
 def player_circle_collision(player: list[pygame.Vector2], circle: CircleShape, debug: dict | None) -> bool:
     '''
     Checks whether a circular object overlaps any edge of the player triangle.
@@ -71,4 +66,17 @@ def player_circle_collision(player: list[pygame.Vector2], circle: CircleShape, d
             return True
     return False
 
-    
+# Player / Item
+def player_rect_collision(player: list[pygame.Vector2], rect: pygame.Rect, debug: dict | None) -> bool:
+    # For each point of the player, check if it's inside the rectangle
+    for point in player:
+        if rect.collidepoint(point):
+            return True
+        
+    edges = [[player[0], player[1]], [player[0], player[2]], [player[1], player[2]]]
+    # Check if any edge is within the rectangle
+    for edge in edges:
+        if rect.clipline(edge):
+            return True
+        
+    return False
