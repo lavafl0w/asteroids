@@ -22,8 +22,8 @@ class Player(CircleShape):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
         nose = self.position + forward * self.radius
-        back_left = self.position - forward * self.radius - right
-        back_right = self.position - forward * self.radius + right
+        back_right = self.position - forward * self.radius - right
+        back_left = self.position - forward * self.radius + right
         return [nose, back_left, back_right]
 
     # Draw a triangle on the screen, coloured white with a line width from constants

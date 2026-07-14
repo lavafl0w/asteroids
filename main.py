@@ -1,6 +1,7 @@
 # INTERNAL COMPONENT IMPORTS
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_state, log_event
+from debug import draw_debug
 from collisions import * #!
 # CLASS IMPORTS
 from player import Player
@@ -69,7 +70,7 @@ def main() -> None:
     test_asteroid.velocity = pygame.Vector2(0,0)
     # NOTE: Future powerup hook: lightweight HUD resources or pickup systems could be introduced around this setup stage.
 
-    DEBUG = True
+    DEBUG = False
 
     # Game Loop
     while True:
@@ -114,13 +115,7 @@ def main() -> None:
                 # Wait for death sound to finish then exit
                 pygame.time.wait(int(death_snd_effect.get_length()*1000))
                 sys.exit()
-            '''    
-
-            debug = player_circle_collision(player1.triangle(), asteroid, debug_data)
-            #if debug:
-             #   print("crash!!")
-
-            
+            '''                
             # Checks for any bullet/asteroid collision
             for bullet in shots:
                 if circle_circle_collision(asteroid, bullet):
@@ -145,23 +140,13 @@ def main() -> None:
         for item in drawable:
             item.draw(screen)
         # FUTURE: Could add the font screen into the drawable group, and if item is a list, use screen.blits
-       
+        
+        #! Draw debug data       
         draw_debug(screen, debug_data)
 
         # After all events/checks are done
         pygame.display.flip() # Refresh display
         dt = py_clock.tick(60) / 1000 # Ticks at 60 FPS (division of 1000 is for milliseconds)
-
-def draw_debug(screen: pygame.Surface, debug_data:dict | None):
-    if debug_data is None:
-        return
-    for _ in debug_data.items():
-        for item in debug_data["points"]:
-            pygame.draw.circle(screen, "green", item, 3)
-        #for item in debug_data["edge"]:
-        pygame.draw.circle(screen, "orange", debug_data["closest"], 3)
-        pygame.draw.line(screen, "red", debug_data["centre"], debug_data["closest"], 3)
-    
 
 if __name__ == "__main__":
     main()

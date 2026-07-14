@@ -38,30 +38,37 @@ def circle_rect_collision(circle: CircleShape, rect:pygame.Rect) -> bool:
 
 def player_circle_collision(player: list[pygame.Vector2], circle: CircleShape, debug: dict | None) -> bool:
     '''
-    Nose > Back Left
-    Nose > Back Right
-    Back Left > Back Right
-    
-    0>1
-    0>2
-    1>2
-    
+    Checks whether a circular object overlaps any edge of the player triangle.
+
+    Triangle edges:
+    - nose -> back_left
+    - nose -> back_right
+    - back_left -> back_right
     '''
-    
-    edges = [[player[1], player[0]], [player[0], player[2]], [player[1], player[2]]]
-    if debug is not None:
-        debug["points"] = [player[0], player[1], player[2]]
+    edges = [[player[0], player[1]], [player[0], player[2]], [player[1], player[2]]]
+
+    # P in the collision-math notes: the centre of the circular object.
+    circle_centre = circle.position
 
     for edge in edges:
-        closest_x = max(edge[0][0], min(circle.position.x, edge[1][0]))
-        closest_y = max(edge[0][1], min(circle.position.y, edge[1][1]))
-        circle_coords_dist = pygame.math.Vector2.distance_to(circle.position, (closest_x, closest_y))
-        if debug is not None:
-            #debug[f"edge"] = [circle.position, (closest_x, closest_y)]
-            if "dist" not in debug or debug["dist"] > circle_coords_dist:
-                debug["dist"] = circle_coords_dist        
-                debug["closest"] = (closest_x, closest_y)               
-            debug["centre"] = circle.position
+        edge_a = edge[0]  # A
+        edge_b = edge[1]  # B
+        edge_direction = edge_b - edge_a  # d
+
+        # Project the circle centre onto the infinite line through A -> B.
+        # This gives the raw "how far along the edge?" value t.
+        t = (circle_centre - edge_a).dot(edge_direction) / edge_direction.dot(edge_direction)
+
+        # Clamp t so the closest point stays on the finite segment, not the
+        # infinite line.
+        t = (max(0, min(t, 1)))
+
+        # Q(t): the closest point on this edge to the circle centre.
+        point_on_edge = edge_a + edge_direction * t
+        circle_coords_dist = pygame.math.Vector2.distance_to(circle.position, point_on_edge)
+        
         if circle_coords_dist <= circle.radius:
             return True
     return False
+
+    
