@@ -66,11 +66,11 @@ def main() -> None:
     # Object Creation
     player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
     field = AsteroidField() # Creates asteroid field
-    #debug_asteroid = Asteroid(700, 350, 40)
-    #debug_asteroid.velocity = pygame.Vector2(0,0)
+    #//debug_asteroid = Asteroid(700, 350, 40)
+    #//debug_asteroid.velocity = pygame.Vector2(0,0)
     # NOTE: Future powerup hook: lightweight HUD resources or pickup systems could be introduced around this setup stage.
 
-    DEBUG = False
+    #//DEBUG = True
 
     # Game Loop
     while True:
@@ -79,7 +79,7 @@ def main() -> None:
         log_state()
 
         # Debugging
-        debug_data = {} if DEBUG == True else None
+        #// debug_data = {} if DEBUG == True else None
 
         # This makes the close button on the window work
         for event in pygame.event.get():
@@ -142,7 +142,7 @@ def main() -> None:
         # FUTURE: Could add the font screen into the drawable group, and if item is a list, use screen.blits
         
         # NOTE: Draw debug data       
-        #draw_debug(screen, debug_data)
+        #//draw_debug(screen, debug_data)
 
         # After all events/checks are done
         pygame.display.flip() # Refresh display
