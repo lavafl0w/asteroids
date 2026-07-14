@@ -103,8 +103,6 @@ def main() -> None:
         # GAME EVENTS #
         for asteroid in asteroids:
             # Checks for player/asteroid collision
-            #! Remember and remove this block comment lol
-            '''
             if collides(player1, asteroid):
                 log_event("player_hit")
                 print("Game over!")
@@ -116,7 +114,7 @@ def main() -> None:
                 # Wait for death sound to finish then exit
                 pygame.time.wait(int(death_snd_effect.get_length()*1000))
                 sys.exit()
-            '''                
+
             # Checks for any bullet/asteroid collision
             for bullet in shots:
                 if collides(asteroid, bullet):
