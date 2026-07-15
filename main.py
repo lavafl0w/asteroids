@@ -1,7 +1,7 @@
 # INTERNAL COMPONENT IMPORTS
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_state, log_event
-from debug import draw_debug
+from debug import *
 from collisions import collides
 import debug_flags
 # CLASS IMPORTS
@@ -82,7 +82,7 @@ def main() -> None:
         log_state()
 
         # Debugging
-        #// debug_data = {} if DEBUG == True else None
+        #//debug_data = {}
 
         # This makes the close button on the window work
         for event in pygame.event.get():
@@ -143,7 +143,7 @@ def main() -> None:
         # FUTURE: Could add the font screen into the drawable group, and if item is a list, use screen.blits
         
         # NOTE: Draw debug data       
-        #//draw_debug(screen, debug_data)
+        #//debug.draw_debug(screen, debug_data)
 
         # After all events/checks are done
         pygame.display.flip() # Refresh display

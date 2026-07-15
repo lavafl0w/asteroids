@@ -1,7 +1,6 @@
 from typing import cast
 from circleshape import CircleShape, TriangleShape
 import pygame
-import logger
 
 # COLLISION LOGIC #
 
@@ -36,7 +35,7 @@ def collides(shape_1: CircleShape, shape_2: CircleShape) -> bool:
         case _:
             raise NotImplementedError(f"Collision case not found for object_1: {shape_1.__class__.__name__} and object_2: {shape_2.__class__.__name__}")
     
-# Bomb Explosion / Asteroid
+# Bomb Explosion / Asteroid -- Circle / Circle
 def circle_overlaps_circle(circle_1: CircleShape, circle_2: CircleShape) -> bool:
     # Calculate distance between center of each CircleShape object
     center_distances = pygame.math.Vector2.distance_to(circle_1.position, circle_2.position)
@@ -60,11 +59,11 @@ def circle_overlaps_rect(circle: CircleShape, rect:pygame.Rect) -> bool:
     # If the distance is within the size of the radius
     if circle_coords_dist <= circle.radius:
         return True
+    
     return False
 
-# Player / Asteroid
-def triangle_overlaps_circle(player: TriangleShape, circle: CircleShape) -> bool:
-    # FUTURE: Asteroid centre inside player
+# Player / Asteroid -- Triangle / Circle
+def triangle_overlaps_circle(triangle: TriangleShape, circle: CircleShape) -> bool:
     '''
     Checks whether a circular object overlaps any edge of the player triangle.
 
@@ -73,11 +72,16 @@ def triangle_overlaps_circle(player: TriangleShape, circle: CircleShape) -> bool
     - nose -> back_right
     - back_left -> back_right
     '''
-    edges = [[player[0], player[1]], [player[0], player[2]], [player[1], player[2]]]
-
+    edges = [[triangle[0], triangle[1]], [triangle[0], triangle[2]], [triangle[1], triangle[2]]]
+    
     # P in the collision-math notes: the centre of the circular object.
     circle_centre = circle.position
 
+    # Check if centre is within triangle // Handles entire circle being
+    # contained in triangle
+    if point_in_triangle(triangle, circle_centre):
+        return True
+    
     for edge in edges:
         edge_a = edge[0]  # A
         edge_b = edge[1]  # B
@@ -97,20 +101,52 @@ def triangle_overlaps_circle(player: TriangleShape, circle: CircleShape) -> bool
         
         if circle_coords_dist <= circle.radius:
             return True
+        
     return False
 
-# Player / Item
-def triangle_overlaps_rect(player: TriangleShape, rect: pygame.Rect) -> bool:
-    # FUTURE: Rect fully inside triangle
-    # For each point of the player, check if it's inside the rectangle
-    for point in player:
+# Player / Item -- Triangle / Rect
+def triangle_overlaps_rect(triangle: TriangleShape, rect: pygame.Rect) -> bool:
+    # Check if any point of rect is inside triangle // handles the case of full rect being contained
+    rect_points = [rect.topleft, rect.topright, rect.bottomleft, rect.bottomright]
+    for point in rect_points:
+        if point_in_triangle(triangle, point):
+            return True
+    
+    # For each point of the triangle, check if it's inside the rectangle
+    for point in triangle:
         if rect.collidepoint(point):
             return True
         
-    edges = [[player[0], player[1]], [player[0], player[2]], [player[1], player[2]]]
+    edges = [[triangle[0], triangle[1]], [triangle[0], triangle[2]], [triangle[1], triangle[2]]]
     # Check if any edge is within the rectangle
     for edge in edges:
         if rect.clipline(edge):
             return True
         
     return False
+
+# Check if a given point is contained within the triangle
+def point_in_triangle(triangle: TriangleShape, point: tuple[int, int] | pygame.Vector2) -> bool:
+    # Get triangle edges - [A>B, B>C, C>A]
+    edges = [[triangle[0], triangle[1]], [triangle[1], triangle[2]], [triangle[2], triangle[0]]]
+    # Counter for the point being on the same edge side
+    inside_count = 0
+
+    for edge in edges:  
+        edge_a = edge[0]  # A
+        edge_b = edge[1]  # B
+        edge_direction = edge_b - edge_a  # d
+        point_vector = point - edge_a # v
+
+        # Cross product of 2D vectors is <, =, or > than 0 depending on
+        # which side the point vector is on
+        if edge_direction.cross(point_vector) >= 0:
+            inside_count += 1 # Point is on the left of triangle edge
+
+    # If point is on the left of all the edges (and so is contained)
+    if inside_count == 3:
+        return True
+    
+    return False
+            
+            
