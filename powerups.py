@@ -1,7 +1,8 @@
 import pygame
 from circleshape import CircleShape
-from constants import * #!
+from constants import BOMB_DETONATE_TIME, TIME_UNTIL_ITEM_DESPAWN, MAX_BOMB_EXPLOSION_TIME, LINE_WIDTH
 from logger import log_event
+from scorekeeper import ScoreKeeper
 
 # PARENT ITEM CLASS #
 class ItemPickup(CircleShape):
@@ -19,7 +20,7 @@ class ItemPickup(CircleShape):
         if self.activated:
             return False # It's already been activated
         self.activated = True
-        print("item activated")
+        ScoreKeeper.item_was_picked_up()
         return True
     
     # Helper for changing the color of the item and starts it flashing    
@@ -78,10 +79,11 @@ class Bomb(ItemPickup):
     
     # Call general activate function and set despawn time to 3
     def activate(self) -> bool:
-        if not super().activate(): # Bomb has already been activated
-            return False 
-        self.time_until_despawn = 3 # This is so the bomb flashes faster when activated
-        return True
+        if super().activate(): # Bomb got activated 
+            ScoreKeeper.bomb_was_activated()
+            self.time_until_despawn = 3 # This is so the bomb flashes faster when activated
+            return True
+        return False
 
     def update(self, dt: float) -> None:
         # Item hasn't been activated yet

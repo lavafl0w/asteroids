@@ -1,8 +1,8 @@
 from logger import log_event
 from circleshape import CircleShape
-from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH
-from powerups import * #!
-
+from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH, BOMB_SPAWN_CHANCE
+from powerups import Bomb
+from scorekeeper import ScoreKeeper
 import pygame
 import random
 
@@ -25,7 +25,7 @@ class Asteroid(CircleShape):
         
         # This was a small asteroid
         if self.radius <= ASTEROID_MIN_RADIUS:
-            
+            ScoreKeeper.asteroid_was_shot()
             # This is where the powerup logic will live
             if random.randrange(0, 100) < BOMB_SPAWN_CHANCE: # If this should be a bomb
                 Bomb(self.position.x, self.position.y)

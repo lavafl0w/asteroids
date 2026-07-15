@@ -9,7 +9,8 @@ from player import Player
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from shot import Shot
-from powerups import * #!
+from powerups import Bomb, BombExplosion
+from scorekeeper import ScoreKeeper
 # SYSTEM IMPORTS
 import pygame
 import sys
@@ -100,6 +101,8 @@ def main() -> None:
         #font_screen = [(font.render("Hello (not) world!", True, (255,255,255)), (10,10)), (font.render("#################", True, (255,255,255)), (20,20))]
         #screen.blits(font_screen)
         
+        ScoreKeeper.tick_time(dt)
+        
         # Update all things updatable with the time since last frame (dt)
         updatable.update(dt)
 
@@ -128,6 +131,7 @@ def main() -> None:
             # Checks for any bomb_explosion/asteroid collision
             for explosion in bomb_explosion:
                 if collides(asteroid, explosion):
+                    ScoreKeeper.asteroid_was_exploded()
                     asteroid.kill()
                     # FUTURE: To add further into keeping score mechanic, this could be different score because it was a bomb
                     # FUTURE: and at the end have something like "Bombs used:" "Asteroids destroyed by bombs:"

@@ -9,6 +9,7 @@ from constants import (
 )
 from shot import Shot
 import pygame
+from scorekeeper import ScoreKeeper
 
 class Player(CircleShape):
     def __init__(self, x: float, y:float) -> None:
@@ -75,6 +76,7 @@ class Player(CircleShape):
             pygame.mixer.Sound("assets/pew-pew-lame-sound-effect.mp3").play()
             # Set shot cooldown to max
             self.shot_cooldown = PLAYER_SHOT_COOLDOWN_SECONDS
+            ScoreKeeper.shot_was_shot()
             
     def hitbox_shape(self) -> TriangleShape:
         return self.triangle()
