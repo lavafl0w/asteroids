@@ -3,6 +3,7 @@ from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 #//from logger import log_state, log_event
 from debug import *
 from collisions import collides
+from hud import HUD
 import debug_flags
 # CLASS IMPORTS
 from player import Player
@@ -48,7 +49,7 @@ def main() -> None:
     pygame_clock = pygame.time.Clock() # FPS clock
     dt = 0.0 # Delta time - Change in time
     screen: pygame.Surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) # Set screen size from constants.py
-    
+    hud = HUD()
     # Group Creation
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
@@ -97,7 +98,7 @@ def main() -> None:
                 
         # Creates a font screen of text to be rendered
         font_screen = font.render("Hello (not) world!", True, (255,255,255))
-        screen.blit(font_screen, (10,10)) # Apply that to the main screen
+        screen.blit(hud.hud_surface, (10,10)) # Apply that to the main screen
         
         # NOTE: If using screen.blits(font_screen), font screen should be a list of tuples (screen, position)
         #font_screen = [(font.render("Hello (not) world!", True, (255,255,255)), (10,10)), (font.render("#################", True, (255,255,255)), (20,20))]
