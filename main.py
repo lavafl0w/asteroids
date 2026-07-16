@@ -1,6 +1,6 @@
 # INTERNAL COMPONENT IMPORTS
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
-from logger import log_state, log_event
+#//from logger import log_state, log_event
 from debug import *
 from collisions import collides
 import debug_flags
@@ -38,12 +38,14 @@ def main() -> None:
     # Sound effects
     # FUTURE: //
     sound_effect = pygame.mixer.Sound
-    death_snd_effect = sound_effect("assets/emotional_damage.mp3")
+    death_audio = sound_effect("assets/emotional_damage.mp3")
     Bomb.explosion_sound = sound_effect("assets/explosion.mp3")
-    Bomb.explosion_sound.set_volume(0.20) 
+    Bomb.tick_sound = sound_effect("assets/bomb_tick.mp3")
+    #//Bomb.explosion_sound.set_volume(0.20)
+    Asteroid.asteroid_split_sound = sound_effect("assets/orb.mp3")
 
     # Internal Components
-    py_clock = pygame.time.Clock() # FPS clock
+    pygame_clock = pygame.time.Clock() # FPS clock
     dt = 0.0 # Delta time - Change in time
     screen: pygame.Surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) # Set screen size from constants.py
     
@@ -80,7 +82,7 @@ def main() -> None:
     while True:
 
         # Initialise Logger
-        log_state()
+        #//log_state()
 
         # Debugging
         #//debug_data = {}
@@ -110,21 +112,21 @@ def main() -> None:
         for asteroid in asteroids:
             # Checks for player/asteroid collision
             if collides(player1, asteroid) and not debug_flags.check('DISABLE_PLAYER_ASTEROID_HIT'):
-                log_event("player_hit")
+                #//log_event("player_hit")
                 print("Game over!")
                 
                 # Stop music and play death sound
                 music.stop()
-                death_snd_effect.play()
+                death_audio.play()
                 
                 # Wait for death sound to finish then exit
-                pygame.time.wait(int(death_snd_effect.get_length()*1000))
+                pygame.time.wait(int(death_audio.get_length()*1000))
                 sys.exit()
 
             # Checks for any bullet/asteroid collision
             for bullet in shots:
                 if collides(asteroid, bullet):
-                    log_event("asteroid_shot")
+                    #//log_event("asteroid_shot")
                     bullet.kill() # Remove bullet object                    
                     asteroid.split() # Call asteroid split logic
             
@@ -151,7 +153,7 @@ def main() -> None:
 
         # After all events/checks are done
         pygame.display.flip() # Refresh display
-        dt = py_clock.tick(60) / 1000 # Ticks at 60 FPS (division of 1000 is for milliseconds)
+        dt = pygame_clock.tick(60) / 1000 # Ticks at 60 FPS (division of 1000 is for milliseconds)
 
 if __name__ == "__main__":
     main()

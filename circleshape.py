@@ -24,7 +24,7 @@ class CircleShape(pygame.sprite.Sprite):
         # must override
         pass
         
-    def hitbox_shape(self) -> "HitboxShape":
+    def get_hitbox(self) -> "HitboxShape":
         return self
     
 TriangleShape = tuple[pygame.Vector2, pygame.Vector2, pygame.Vector2]

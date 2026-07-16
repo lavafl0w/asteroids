@@ -78,6 +78,6 @@ class Player(CircleShape):
             self.shot_cooldown = PLAYER_SHOT_COOLDOWN_SECONDS
             ScoreKeeper.shot_was_shot()
             
-    def hitbox_shape(self) -> TriangleShape:
+    def get_hitbox(self) -> TriangleShape:
         return self.triangle()
             

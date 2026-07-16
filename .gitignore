@@ -9,10 +9,11 @@ wheels/
 # Virtual environments
 .venv/
 
-# Log Files
+# Log Files / Dev
 game_state.jsonl
 game_events.jsonl
 debug_flags_local.py
+assets/unused
 
 # Remove .md notes, keeping readme.me
 *.md

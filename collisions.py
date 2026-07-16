@@ -14,23 +14,23 @@ def collides(shape_1: CircleShape, shape_2: CircleShape) -> bool:
     match shape_1.hitbox_kind, shape_2.hitbox_kind:
         case "circle", "circle":
             return circle_overlaps_circle(
-                cast(CircleShape, shape_1.hitbox_shape()),
-                cast(CircleShape, shape_2.hitbox_shape()),
+                cast(CircleShape, shape_1.get_hitbox()),
+                cast(CircleShape, shape_2.get_hitbox()),
             )
         case "circle", "rect":
             return circle_overlaps_rect(
-                cast(CircleShape, shape_1.hitbox_shape()),
-                cast(pygame.Rect, shape_2.hitbox_shape()),
+                cast(CircleShape, shape_1.get_hitbox()),
+                cast(pygame.Rect, shape_2.get_hitbox()),
             )
         case "triangle", "circle":
             return triangle_overlaps_circle(
-                cast(TriangleShape, shape_1.hitbox_shape()),
-                cast(CircleShape, shape_2.hitbox_shape()),
+                cast(TriangleShape, shape_1.get_hitbox()),
+                cast(CircleShape, shape_2.get_hitbox()),
             )
         case "triangle", "rect":
             return triangle_overlaps_rect(
-                cast(TriangleShape, shape_1.hitbox_shape()),
-                cast(pygame.Rect, shape_2.hitbox_shape()),
+                cast(TriangleShape, shape_1.get_hitbox()),
+                cast(pygame.Rect, shape_2.get_hitbox()),
             )
         case _:
             raise NotImplementedError(f"Collision case not found for object_1: {shape_1.__class__.__name__} and object_2: {shape_2.__class__.__name__}")

@@ -1,4 +1,3 @@
-from logger import log_event
 from circleshape import CircleShape
 from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH, BOMB_SPAWN_CHANCE
 from powerups import Bomb
@@ -8,6 +7,7 @@ import random
 
 
 class Asteroid(CircleShape):
+    asteroid_split_sound: pygame.mixer.Sound | None = None # Asteroid split sound gets assigned after importing
     def __init__(self, x: float, y: float, radius: float) -> None:
         super().__init__(x, y, radius)
     
@@ -23,6 +23,9 @@ class Asteroid(CircleShape):
     def split(self) -> None:
         self.kill() # Regardless of size, this asteroid should be destroyed first
         
+        if Asteroid.asteroid_split_sound is not None: # Check sound is assigned and play
+            Asteroid.asteroid_split_sound.play()
+        
         # This was a small asteroid
         if self.radius <= ASTEROID_MIN_RADIUS:
             ScoreKeeper.asteroid_was_shot()
@@ -32,8 +35,7 @@ class Asteroid(CircleShape):
                 return # Return after so multiple powerups don't spawn
             
             return
-        
-        log_event("asteroid_split")
+
         new_rotation = random.uniform(20, 50)
         
         # Creates new rotation vectors for smaller asteroids
