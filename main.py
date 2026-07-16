@@ -61,9 +61,6 @@ def main() -> None:
 
         # Background set
         screen.fill("black")
-                
-        # Apply the hud surface to the display
-        screen.blit(hud.hud_surface, (10,10))
         
         # Track game time
         ScoreKeeper.tick_time(dt)
@@ -108,6 +105,9 @@ def main() -> None:
         for item in container_group["drawable"]:
             item.draw(screen)
         
+        # Apply the hud surface to the display over all the drawn sprites
+        screen.blit(hud.hud_surface, (10,10))
+                
         # NOTE: Draw debug data       
         #//debug.draw_debug(screen, debug_data)
 

@@ -67,7 +67,7 @@ def assign_containers(g) -> None:
 # Music on/off
 def toggle_music() -> None:
     
-    if pygame.mixer.music.get_busy:
+    if pygame.mixer.music.get_busy():
         pygame.mixer.music.stop()        
         return
     
