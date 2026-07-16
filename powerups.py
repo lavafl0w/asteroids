@@ -1,6 +1,12 @@
 import pygame
 from circleshape import CircleShape
-from constants import BOMB_DETONATE_COUNTDOWN_TIME, TIME_LEFT_BEFORE_ITEM_DESPAWN, MAX_BOMB_EXPLOSION_TIME, LINE_WIDTH, BOMB_EXPLOSION_RADIUS_EXPANSION
+from constants import (
+    BOMB_DETONATE_COUNTDOWN_TIME,
+    TIME_LEFT_BEFORE_ITEM_DESPAWN,
+    MAX_BOMB_EXPLOSION_TIME,
+    LINE_WIDTH,
+    BOMB_EXPLOSION_RADIUS_EXPANSION
+)
 from scorekeeper import ScoreKeeper
 
 # PARENT ITEM CLASS #
@@ -82,7 +88,7 @@ class Bomb(BaseItemPowerup):
         if super().activate(): # Bomb got activated 
             ScoreKeeper.bomb_was_activated()
             self.time_until_despawn = self.time_before_detonation # This is so the bomb flashes faster on trigger
-            if Bomb.tick_sound is not None: # Need this here to play the first beep as the bomb activation doesn't look natural without it
+            if Bomb.tick_sound is not None: # Need to play the first beep as it doesn't look right without it
                 Bomb.tick_sound.play()
             return True
         return False

@@ -8,6 +8,7 @@ import random
 
 class Asteroid(CircleShape):
     asteroid_split_sound: pygame.mixer.Sound | None = None # Asteroid split sound gets assigned after importing
+    
     def __init__(self, x: float, y: float, radius: float) -> None:
         super().__init__(x, y, radius)
     
@@ -29,7 +30,7 @@ class Asteroid(CircleShape):
         # This was a small asteroid
         if self.radius <= ASTEROID_MIN_RADIUS:
             ScoreKeeper.asteroid_was_shot()
-            # This is where the powerup logic will live
+            # NOTE: This is where the powerup logic will live
             if random.randrange(0, 100) < BOMB_SPAWN_CHANCE: # If this should be a bomb
                 Bomb(self.position.x, self.position.y)
                 return # Return after so multiple powerups don't spawn

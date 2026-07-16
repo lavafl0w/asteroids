@@ -46,21 +46,22 @@ def circle_overlaps_circle(circle_1: CircleShape, circle_2: CircleShape) -> bool
         
     return False
 
-# Not used currently
+#* Not used currently
 def circle_overlaps_rect(circle: CircleShape, rect:pygame.Rect) -> bool: 
-    # This takes the center position of the circle, and finds the closest point within the bounds of the Rect
-    # If circle x is left of Rect - use that.. right of Rect - use that, somewhere in the middle, circle x
-    closest_x = max(rect.left, min(circle.position.x, rect.right))
-    closest_y = max(rect.top, min(circle.position.y, rect.bottom))
-    
-    # Get the distance from the centre of the circle to the closest points
-    circle_coords_dist = pygame.math.Vector2.distance_to(circle.position, (closest_x, closest_y))
-    
-    # If the distance is within the size of the radius
-    if circle_coords_dist <= circle.radius:
-        return True
-    
-    return False
+    raise Exception("circle_overlaps_rect collision isn't used right now, you need to reennable it")
+#    # This takes the center position of the circle, and finds the closest point within the bounds of the Rect
+#    # If circle x is left of Rect - use that.. right of Rect - use that, somewhere in the middle, circle x
+#    closest_x = max(rect.left, min(circle.position.x, rect.right))
+#    closest_y = max(rect.top, min(circle.position.y, rect.bottom))
+#    
+#    # Get the distance from the centre of the circle to the closest points
+#    circle_coords_dist = pygame.math.Vector2.distance_to(circle.position, (closest_x, closest_y))
+#    
+#    # If the distance is within the size of the radius
+#    if circle_coords_dist <= circle.radius:
+#        return True
+#    
+#    return False
 
 # Player / Asteroid -- Triangle / Circle
 def triangle_overlaps_circle(triangle: TriangleShape, circle: CircleShape) -> bool:

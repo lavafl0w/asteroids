@@ -76,7 +76,7 @@ class Player(CircleShape):
             bullet.velocity = pygame.math.Vector2(0,1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
             # Pew pew pew
             if self.shot_audio is not None:
-                self.shot_audio.play() #pygame.mixer.Sound("assets/pew-pew-lame-sound-effect.mp3").play()
+                self.shot_audio.play()
             # Set shot cooldown to max
             self.shot_cooldown = PLAYER_SHOT_COOLDOWN_SECONDS
             ScoreKeeper.shot_was_shot()

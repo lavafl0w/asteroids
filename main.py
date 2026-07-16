@@ -1,6 +1,5 @@
 # INTERNAL COMPONENT IMPORTS
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
-#//from logger import log_state, log_event
 from debug import *
 from collisions import collides
 from hud import HUD
@@ -23,68 +22,34 @@ def main() -> None:
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
 
+    # Start pygame internals and get back the screen, the clock and the font to use
     screen, pygame_clock, font = setup.setup_pygame()
-    audio_bank = setup.setup_audio()
+    
+    # Get audio set up, play music and assign effects
+    setup.setup_audio()
+    
+    # Get the groups and sprites all ready to go
     container_group = setup.setup_groups()
     
-    #music = audio_dict["music"]
-    #sound_effect = audio_dict["sound_effect"]
-    # Start Pygame instance, enables fonts and music
-    #pygame.init()
-    #pygame.font.init()
-    #pygame.mixer.init()
-        
-    # Set up font for display
-    #font = pygame.font.SysFont(None, 36)
+    # Delta time - track change in time between loops
+    dt = 0.0
     
-    # Load music track and play infinitely (-1)
-    #audio_bank["music"].play(-1)
-    
-    # Sound effects
-    #death_audio = audio_bank["death_audio"]
-    #Bomb.explosion_sound = audio_bank["bomb_explosion"]
-    #Bomb.tick_sound = audio_bank["bomb_tick"]
-    #Asteroid.asteroid_split_sound = audio_bank["asteroid_split"]
-
-    # Internal Components
-    #pygame_clock = pygame.time.Clock() # FPS clock
-    dt = 0.0 # Delta time - Change in time
-    #screen: pygame.Surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) # Set screen size from constants.py
+    # HUD display
     hud = HUD()
-    
-    # Group Creation
-    #updatable = pygame.sprite.Group()
-    #drawable = pygame.sprite.Group()
-    #asteroids = pygame.sprite.Group()
-    #shots = pygame.sprite.Group()
-    #powerups = pygame.sprite.Group()
-    #bomb_explosion = pygame.sprite.Group()
-    
-    # Group Assignment
-    #AsteroidField.containers = (updatable) # AstroidField class -> updatable
-    #Player.containers = (updatable, drawable) # Player class -> updatable and drawable groups
-    #Shot.containers = (updatable, drawable, shots) # Shot class -> updatable, drawable, shots
-    #Asteroid.containers = (updatable, drawable, asteroids) # Astroid class -> updatable, drawable and asteroids
-    #Bomb.containers = (updatable, drawable, powerups) # Bomb class -> updatable, drawable, powerups
-    #BombExplosion.containers = (updatable, drawable, bomb_explosion)
-    #Font.containers = (updatable, drawable) #? Can the font class be added to drawable container? Then it can be used to update and draw...
     
     # Object Creation
     player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
     field = AsteroidField() # Creates asteroid field
-    if debug_flags.check('ONLY_DRAW_SINGLE_ASTEROID'):
-        field.kill()
-        debug_asteroid = Asteroid(700, 350, 40)
-        debug_asteroid.velocity = pygame.Vector2(0,0)
-    # NOTE: Future powerup hook: lightweight HUD resources or pickup systems could be introduced around this setup stage.
-
+    
+    #//if debug_flags.check('ONLY_DRAW_SINGLE_ASTEROID'):
+    #//    field.kill()
+    #//    debug_asteroid = Asteroid(700, 350, 40)
+    #//    debug_asteroid.velocity = pygame.Vector2(0,0)
+        
     #//DEBUG = True
 
     # Game Loop
     while True:
-
-        # Initialise Logger
-        #//log_state()
 
         # Debugging
         #//debug_data = {}
@@ -97,14 +62,10 @@ def main() -> None:
         # Background set
         screen.fill("black")
                 
-        # Creates a font screen of text to be rendered
-        font_screen = font.render("Hello (not) world!", True, (255,255,255))
-        screen.blit(hud.hud_surface, (10,10)) # Apply that to the main screen
+        # Apply the hud surface to the display
+        screen.blit(hud.hud_surface, (10,10))
         
-        # NOTE: If using screen.blits(font_screen), font screen should be a list of tuples (screen, position)
-        #font_screen = [(font.render("Hello (not) world!", True, (255,255,255)), (10,10)), (font.render("#################", True, (255,255,255)), (20,20))]
-        #screen.blits(font_screen)
-        
+        # Track game time
         ScoreKeeper.tick_time(dt)
         
         # Update all things updatable with the time since last frame (dt)
@@ -117,7 +78,7 @@ def main() -> None:
                 print("Game over!")
                 
                 # Stop music and play death sound
-                audio_bank["music"].stop()
+                setup.toggle_music()
                 if player1.death_audio is not None:
                     player1.death_audio.play()
                     pygame.time.wait(int(player1.death_audio.get_length()*1000))
@@ -146,7 +107,6 @@ def main() -> None:
         # Draw everything on screen that can be drawn
         for item in container_group["drawable"]:
             item.draw(screen)
-        # FUTURE: Could add the font screen into the drawable group, and if item is a list, use screen.blits
         
         # NOTE: Draw debug data       
         #//debug.draw_debug(screen, debug_data)
