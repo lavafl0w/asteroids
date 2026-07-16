@@ -11,7 +11,9 @@ from shot import Shot
 import pygame
 from scorekeeper import ScoreKeeper
 
-class Player(CircleShape):
+class Player(CircleShape):    
+    death_audio: pygame.mixer.Sound | None = None # Death sound gets assigned after importing
+    shot_audio: pygame.mixer.Sound | None = None
     def __init__(self, x: float, y:float) -> None:
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
@@ -73,7 +75,8 @@ class Player(CircleShape):
             # Creates, rotates and increases speed of newly created shot
             bullet.velocity = pygame.math.Vector2(0,1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
             # Pew pew pew
-            pygame.mixer.Sound("assets/pew-pew-lame-sound-effect.mp3").play()
+            if self.shot_audio is not None:
+                self.shot_audio.play() #pygame.mixer.Sound("assets/pew-pew-lame-sound-effect.mp3").play()
             # Set shot cooldown to max
             self.shot_cooldown = PLAYER_SHOT_COOLDOWN_SECONDS
             ScoreKeeper.shot_was_shot()

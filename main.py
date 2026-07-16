@@ -5,6 +5,7 @@ from debug import *
 from collisions import collides
 from hud import HUD
 import debug_flags
+import setup
 # CLASS IMPORTS
 from player import Player
 from asteroid import Asteroid
@@ -22,51 +23,51 @@ def main() -> None:
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
 
+    screen, pygame_clock, font = setup.setup_pygame()
+    audio_bank = setup.setup_audio()
+    container_group = setup.setup_groups()
+    
+    #music = audio_dict["music"]
+    #sound_effect = audio_dict["sound_effect"]
     # Start Pygame instance, enables fonts and music
-    pygame.init()
-    pygame.font.init()
-    pygame.mixer.init()
+    #pygame.init()
+    #pygame.font.init()
+    #pygame.mixer.init()
         
     # Set up font for display
-    font = pygame.font.SysFont(None, 36)
+    #font = pygame.font.SysFont(None, 36)
     
     # Load music track and play infinitely (-1)
-    # FUTURE: call an overall sound effect assignment for music, sound effects and group assignment (?)
-    music = pygame.mixer.music
-    music.load('assets/music_g_m.mp3')
-    music.play(-1)
+    #audio_bank["music"].play(-1)
     
     # Sound effects
-    # FUTURE: //
-    sound_effect = pygame.mixer.Sound
-    death_audio = sound_effect("assets/emotional_damage.mp3")
-    Bomb.explosion_sound = sound_effect("assets/explosion.mp3")
-    Bomb.tick_sound = sound_effect("assets/bomb_tick.mp3")
-    #//Bomb.explosion_sound.set_volume(0.20)
-    Asteroid.asteroid_split_sound = sound_effect("assets/orb.mp3")
+    #death_audio = audio_bank["death_audio"]
+    #Bomb.explosion_sound = audio_bank["bomb_explosion"]
+    #Bomb.tick_sound = audio_bank["bomb_tick"]
+    #Asteroid.asteroid_split_sound = audio_bank["asteroid_split"]
 
     # Internal Components
-    pygame_clock = pygame.time.Clock() # FPS clock
+    #pygame_clock = pygame.time.Clock() # FPS clock
     dt = 0.0 # Delta time - Change in time
-    screen: pygame.Surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) # Set screen size from constants.py
+    #screen: pygame.Surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) # Set screen size from constants.py
     hud = HUD()
+    
     # Group Creation
-    updatable = pygame.sprite.Group()
-    drawable = pygame.sprite.Group()
-    asteroids = pygame.sprite.Group()
-    shots = pygame.sprite.Group()
-    powerups = pygame.sprite.Group()
-    bomb_explosion = pygame.sprite.Group()
+    #updatable = pygame.sprite.Group()
+    #drawable = pygame.sprite.Group()
+    #asteroids = pygame.sprite.Group()
+    #shots = pygame.sprite.Group()
+    #powerups = pygame.sprite.Group()
+    #bomb_explosion = pygame.sprite.Group()
     
     # Group Assignment
-    # FUTURE: //
-    Player.containers = (updatable, drawable) # Player class -> updatable and drawable groups
-    Asteroid.containers = (updatable, drawable, asteroids) # Astroid class -> updatable, drawable and asteroids
-    AsteroidField.containers = (updatable) # AstroidField class -> updatable
-    Shot.containers = (updatable, drawable, shots) # Shot class -> updatable, drawable, shots
+    #AsteroidField.containers = (updatable) # AstroidField class -> updatable
+    #Player.containers = (updatable, drawable) # Player class -> updatable and drawable groups
+    #Shot.containers = (updatable, drawable, shots) # Shot class -> updatable, drawable, shots
+    #Asteroid.containers = (updatable, drawable, asteroids) # Astroid class -> updatable, drawable and asteroids
+    #Bomb.containers = (updatable, drawable, powerups) # Bomb class -> updatable, drawable, powerups
+    #BombExplosion.containers = (updatable, drawable, bomb_explosion)
     #Font.containers = (updatable, drawable) #? Can the font class be added to drawable container? Then it can be used to update and draw...
-    Bomb.containers = (updatable, drawable, powerups) # Bomb class -> updatable, drawable, powerups
-    BombExplosion.containers = (updatable, drawable, bomb_explosion)
     
     # Object Creation
     player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
@@ -107,32 +108,30 @@ def main() -> None:
         ScoreKeeper.tick_time(dt)
         
         # Update all things updatable with the time since last frame (dt)
-        updatable.update(dt)
+        container_group["updatable"].update(dt)
 
         # GAME EVENTS #
-        for asteroid in asteroids:
+        for asteroid in container_group["asteroids"]:
             # Checks for player/asteroid collision
             if collides(player1, asteroid) and not debug_flags.check('DISABLE_PLAYER_ASTEROID_HIT'):
-                #//log_event("player_hit")
                 print("Game over!")
                 
                 # Stop music and play death sound
-                music.stop()
-                death_audio.play()
-                
+                audio_bank["music"].stop()
+                if player1.death_audio is not None:
+                    player1.death_audio.play()
+                    pygame.time.wait(int(player1.death_audio.get_length()*1000))
                 # Wait for death sound to finish then exit
-                pygame.time.wait(int(death_audio.get_length()*1000))
                 sys.exit()
 
             # Checks for any bullet/asteroid collision
-            for bullet in shots:
+            for bullet in container_group["shots"]:
                 if collides(asteroid, bullet):
-                    #//log_event("asteroid_shot")
                     bullet.kill() # Remove bullet object                    
                     asteroid.split() # Call asteroid split logic
             
             # Checks for any bomb_explosion/asteroid collision
-            for explosion in bomb_explosion:
+            for explosion in container_group["explosion_radii"]:
                 if collides(asteroid, explosion):
                     ScoreKeeper.asteroid_was_exploded()
                     asteroid.kill()
@@ -140,12 +139,12 @@ def main() -> None:
                     # FUTURE: and at the end have something like "Bombs used:" "Asteroids destroyed by bombs:"
         
         # Checks for any item/powerup collision with player i.e player has picked something up
-        for item in powerups:
+        for item in container_group["powerup_items"]:
             if collides(player1, item):
                 item.activate()
         
         # Draw everything on screen that can be drawn
-        for item in drawable:
+        for item in container_group["drawable"]:
             item.draw(screen)
         # FUTURE: Could add the font screen into the drawable group, and if item is a list, use screen.blits
         
