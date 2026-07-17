@@ -4,7 +4,9 @@ from constants import (
     PLAYER_RADIUS,
     PLAYER_SHOOT_SPEED,
     PLAYER_SHOT_COOLDOWN_SECONDS,
-    PLAYER_SPEED,
+    PLAYER_MAX_SPEED,
+    PLAYER_ACCELERATION,
+    FRICTION_DRAG,
     PLAYER_TURN_SPEED,
     PLAYER_HIT_COOLDOWN,
     SHIELD_RADIUS,
@@ -61,6 +63,9 @@ class Player(CircleShape):
             self.rotate(dt)
         if keys[pygame.K_SPACE]: # Shoot - Key: Space
             self.shoot()
+        
+        self.velocity *= FRICTION_DRAG
+        self.position += self.velocity
             
         self.shot_cooldown -= dt # Decreases shot cooldown
         self.hit_cooldown -= dt # Decreases hit/invincible cooldown
@@ -81,8 +86,8 @@ class Player(CircleShape):
     def move(self, dt: float) -> None:
         unit_vector = pygame.math.Vector2(0,1) # Creates a unit vector of length 1
         rotated_vector = unit_vector.rotate(self.rotation) # Rotates vector in same direction of player
-        speed_vector = rotated_vector * PLAYER_SPEED * dt # Extends the length of the vector by how much the player should move in frame
-        self.position += speed_vector # Makes this the new position
+        speed_vector = rotated_vector * PLAYER_ACCELERATION * dt # Extends the length of the vector by how much the player should move in frame
+        self.velocity += speed_vector # Makes this the new position
         
     # Rotates player sprite
     def rotate(self, dt: float) -> None:
@@ -109,22 +114,24 @@ class Player(CircleShape):
         death_channel = None
         
         if self.hit_cooldown <= 0:
-            if self.player_hit_audio is not None: # Oof
-                self.player_hit_audio.play()
-                
-            if self.player_lives <= 1: # Death
-                if self.death_audio is not None:
-                    death_channel = self.death_audio.play()
-                    
-                self.hit_cooldown = PLAYER_HIT_COOLDOWN
-                return death_channel
-                
+            
             # Remove life and reset cooldown
             self.player_lives -= 1
             self.hit_cooldown = PLAYER_HIT_COOLDOWN
+                
+            if self.player_lives <= 0: # Death
+                if self.death_audio is not None:
+                    death_channel = self.death_audio.play()
+
+            if self.player_hit_audio is not None and self.player_lives >= 1: # Oof
+                self.player_hit_audio.play()
+                
+        return death_channel
+                
+
         
         # Returns the channel so main.py can tell the player died    
-        return death_channel
+        #return death_channel
     
     # Add an effect to the player
     def player_effect_add(self, effect: str) -> None:
