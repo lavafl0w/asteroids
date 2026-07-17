@@ -62,9 +62,17 @@ def main() -> None:
             container_groups["updatable"].update(dt)
 
             #* GAME EVENTS #
-            # Checks any asteroid collision
-            for asteroid in container_groups["asteroids"]: 
-                
+            # Checks any asteroid/asteroid collision
+            asteroids_group = list(container_groups["asteroids"])
+            for i in range(0, len(asteroids_group)):
+                asteroid_1 = asteroids_group[i]
+                for j in range(i+1, len(asteroids_group)):
+                    asteroid_2 = asteroids_group[j]
+                    if collides(asteroid_1, asteroid_2):
+                        asteroid_1.bounce(asteroid_2)                
+
+            # Checks for any other asteroid collision
+            for asteroid in container_groups["asteroids"]:                 
                 # Checks player/asteroid collision
                 if collides(player1, asteroid):
                     death_channel = player1.asteroid_hit()
