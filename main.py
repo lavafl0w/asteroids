@@ -1,16 +1,14 @@
 # INTERNAL COMPONENT IMPORTS
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
-from debug import *
 from collisions import collides
 from hud import HUD
-import debug_flags
 import setup
 # CLASS IMPORTS
 from player import Player
-from asteroid import Asteroid
+#//from asteroid import Asteroid
 from asteroidfield import AsteroidField
-from shot import Shot
-from powerups import Bomb, BombExplosion
+#//from shot import Shot
+#//from powerups import Bomb, BombExplosion
 from scorekeeper import ScoreKeeper
 # SYSTEM IMPORTS
 import pygame
@@ -29,7 +27,7 @@ def main() -> None:
     setup.setup_audio()
     
     # Get the groups and sprites all ready to go
-    container_group = setup.setup_groups()
+    container_groups = setup.setup_groups()
     
     # Delta time - track change in time between loops
     dt = 0.0
@@ -40,20 +38,13 @@ def main() -> None:
     # Object Creation
     player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
     field = AsteroidField() # Creates asteroid field
-    
-    #//if debug_flags.check('ONLY_DRAW_SINGLE_ASTEROID'):
-    #//    field.kill()
-    #//    debug_asteroid = Asteroid(700, 350, 40)
-    #//    debug_asteroid.velocity = pygame.Vector2(0,0)
-        
-    #//DEBUG = True
 
+    game_state = "playing"
+    death_channel: None | pygame.mixer.Channel = None
+    
     # Game Loop
     while True:
-
-        # Debugging
-        #//debug_data = {}
-
+        
         # This makes the close button on the window work
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -62,54 +53,58 @@ def main() -> None:
         # Background set
         screen.fill("black")
         
-        # Track game time
-        ScoreKeeper.tick_time(dt)
+        #* Normal gameplay
+        if game_state == "playing":
+            # Increase game time
+            ScoreKeeper.tick_time(dt)
         
-        # Update all things updatable with the time since last frame (dt)
-        container_group["updatable"].update(dt)
+            # Update all things updatable with the time since last frame (dt)
+            container_groups["updatable"].update(dt)
 
-        # GAME EVENTS #
-        for asteroid in container_group["asteroids"]:
-            # Checks for player/asteroid collision
-            if collides(player1, asteroid) and not debug_flags.check('DISABLE_PLAYER_ASTEROID_HIT'):
-                print("Game over!")
+            #* GAME EVENTS #
+            # Checks any asteroid collision
+            for asteroid in container_groups["asteroids"]: 
                 
-                # Stop music and play death sound
-                setup.toggle_music()
-                if player1.death_audio is not None:
-                    player1.death_audio.play()
-                    pygame.time.wait(int(player1.death_audio.get_length()*1000))
-                # Wait for death sound to finish then exit
-                sys.exit()
+                # Checks player/asteroid collision
+                if collides(player1, asteroid):
+                    death_channel = player1.asteroid_hit()
+                    if death_channel is not None: # If asteroid_hit() played sound, death_channel is no longer None
+                        setup.toggle_music() # Switch music off
+                        game_state = "death_pause"
+                        break
 
-            # Checks for any bullet/asteroid collision
-            for bullet in container_group["shots"]:
-                if collides(asteroid, bullet):
-                    bullet.kill() # Remove bullet object                    
-                    asteroid.split() # Call asteroid split logic
-            
-            # Checks for any bomb_explosion/asteroid collision
-            for explosion in container_group["explosion_radii"]:
-                if collides(asteroid, explosion):
-                    ScoreKeeper.asteroid_was_exploded()
-                    asteroid.kill()
-                    # FUTURE: To add further into keeping score mechanic, this could be different score because it was a bomb
-                    # FUTURE: and at the end have something like "Bombs used:" "Asteroids destroyed by bombs:"
+                # Checks for any bullet/asteroid collision
+                for bullet in container_groups["shots"]:
+                    if collides(asteroid, bullet):
+                        bullet.kill() # Remove bullet object                    
+                        asteroid.split() # Call asteroid split logic
+
+                # Checks for any bomb_explosion/asteroid collision
+                for explosion in container_groups["explosion_radii"]:
+                    if collides(asteroid, explosion):
+                        ScoreKeeper.asteroid_was_exploded()
+                        asteroid.kill()
+                        # FUTURE: To add further into keeping score mechanic, this could be different score because it was a bomb
+                        # FUTURE: and at the end have something like "Bombs used:" "Asteroids destroyed by bombs:"
         
-        # Checks for any item/powerup collision with player i.e player has picked something up
-        for item in container_group["powerup_items"]:
-            if collides(player1, item):
-                item.activate()
+            # Checks for any item/powerup collision with player
+            for item in container_groups["powerup_items"]:
+                if collides(player1, item):
+                    item.activate()
         
+        #* If player has died            
+        elif game_state == "death_pause":
+            if death_channel is not None:
+                # If the channel is no longer playing something
+                if not death_channel.get_busy():
+                    sys.exit()
+                
         # Draw everything on screen that can be drawn
-        for item in container_group["drawable"]:
+        for item in container_groups["drawable"]:
             item.draw(screen)
         
         # Apply the hud surface to the display over all the drawn sprites
         screen.blit(hud.hud_surface, (10,10))
-                
-        # NOTE: Draw debug data       
-        #//debug.draw_debug(screen, debug_data)
 
         # After all events/checks are done
         pygame.display.flip() # Refresh display

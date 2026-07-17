@@ -66,7 +66,7 @@ class BaseItemPowerup(CircleShape):
 
 class Bomb(BaseItemPowerup):
     explosion_sound: pygame.mixer.Sound | None = None # Sound effects set at None for import, attached after
-    tick_sound: pygame.mixer.Sound | None = None
+    countdown_sound: pygame.mixer.Sound | None = None
     width = 40
     height = 25
     
@@ -88,8 +88,8 @@ class Bomb(BaseItemPowerup):
         if super().activate(): # Bomb got activated 
             ScoreKeeper.bomb_was_activated()
             self.time_until_despawn = self.time_before_detonation # This is so the bomb flashes faster on trigger
-            if Bomb.tick_sound is not None: # Need to play the first beep as it doesn't look right without it
-                Bomb.tick_sound.play()
+            if Bomb.countdown_sound is not None: # Play the first beep as it doesn't look right without it
+                Bomb.countdown_sound.play()
             return True
         return False
 
@@ -100,13 +100,14 @@ class Bomb(BaseItemPowerup):
                     
         # Activated so let's blow something up!
         elif self.is_activated == True: 
+            
             # Beep-Beep-Beep
-
             if self.time_before_detonation > 0:
                 old_visible_state = self.is_visible
                 self.update_warning_blink(dt, "red")
-                if Bomb.tick_sound is not None and (not old_visible_state and self.is_visible):
-                    Bomb.tick_sound.play()
+                # If the bomb sound exists, and the bomb has flashed off -> on this frame
+                if Bomb.countdown_sound is not None and (not old_visible_state and self.is_visible):
+                    Bomb.countdown_sound.play()
                
                 self.time_before_detonation -= dt
                 return

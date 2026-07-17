@@ -26,17 +26,18 @@ def setup_audio() -> None:
     
     # Load music and play
     music = pygame.mixer.music
-    music.load('assets/music_g_m.mp3')
+    music.load('assets/music_glorious_morning.mp3')
     toggle_music()
     
     sound_effect = pygame.mixer.Sound
     
     # Player sound effects
     player.Player.death_audio = sound_effect("assets/emotional_damage.mp3")
-    player.Player.shot_audio = sound_effect("assets/pew-pew-lame-sound-effect.mp3")
+    player.Player.shot_audio = sound_effect("assets/pew_pew.mp3")
+    player.Player.player_hit_audio = sound_effect("assets/player_hit_oof.mp3")
     # Bomb related sound effects
     powerups.Bomb.explosion_sound = sound_effect("assets/explosion.mp3")
-    powerups.Bomb.tick_sound = sound_effect("assets/bomb_tick.mp3")
+    powerups.Bomb.countdown_sound = sound_effect("assets/bomb_countdown_beep.mp3")
     # Asteroid related sound effects
     asteroid.Asteroid.asteroid_split_sound = sound_effect("assets/orb.mp3")
     
