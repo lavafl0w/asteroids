@@ -84,7 +84,7 @@ def main() -> None:
                 # Checks for any bullet/asteroid collision
                 for interactor in container_groups["asteroid_interactors"]:
                     if collides(asteroid, interactor):
-                        if interactor.hit(): # If the hit connected                    
+                        if interactor.hit(): # If the hit connected...            
                             asteroid.split() # Call asteroid split logic
                         else:
                             asteroid.bounce(interactor) # Bounce away from it

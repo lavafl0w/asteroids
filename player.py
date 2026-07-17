@@ -64,11 +64,18 @@ class Player(CircleShape):
         if keys[pygame.K_SPACE]: # Shoot - Key: Space
             self.shoot()
         
+        # Reduce velocity by drag factor and apply it to the position
         self.velocity *= FRICTION_DRAG
-        self.position += self.velocity
-            
-        self.shot_cooldown -= dt # Decreases shot cooldown
-        self.hit_cooldown -= dt # Decreases hit/invincible cooldown
+        current_speed = self.velocity.length()
+        if current_speed > PLAYER_MAX_SPEED:
+            self.velocity *= (PLAYER_MAX_SPEED / current_speed)
+        
+        self.position += self.velocity * dt
+        
+        
+        # Decrease any cooldowns    
+        self.shot_cooldown -= dt
+        self.hit_cooldown -= dt
         
         # If player is safe after last hit, they are red
         if self.hit_cooldown > 0:
@@ -86,8 +93,10 @@ class Player(CircleShape):
     def move(self, dt: float) -> None:
         unit_vector = pygame.math.Vector2(0,1) # Creates a unit vector of length 1
         rotated_vector = unit_vector.rotate(self.rotation) # Rotates vector in same direction of player
-        speed_vector = rotated_vector * PLAYER_ACCELERATION * dt # Extends the length of the vector by how much the player should move in frame
-        self.velocity += speed_vector # Makes this the new position
+        
+        # Extend the length of the vector by how much the player should accelerate this frame
+        acceleration_vector = rotated_vector * PLAYER_ACCELERATION * dt 
+        self.velocity += acceleration_vector # Makes this the new position
         
     # Rotates player sprite
     def rotate(self, dt: float) -> None:
