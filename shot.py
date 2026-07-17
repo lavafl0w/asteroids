@@ -13,3 +13,7 @@ class Shot(CircleShape):
     # On update: move the bullet    
     def update(self, dt: float) -> None:
         self.position += (self.velocity * dt)
+        
+    def hit(self) -> bool:
+        self.kill()
+        return True

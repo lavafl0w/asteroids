@@ -145,7 +145,7 @@ class ShieldPowerup(CircleShape):
         self.activated = True
         self.shield_time_remaining = SHIELD_TIME
         self.shield_hits_remaining = SHIELD_MAX_HIT
-        self.shield_hit_cooldown = PLAYER_HIT_COOLDOWN
+        self.shield_hit_cooldown = 0
         
     def draw(self, screen: pygame.Surface) -> None:
         pygame.draw.circle(screen, "orange", self.position, self.radius, LINE_WIDTH)
@@ -154,12 +154,25 @@ class ShieldPowerup(CircleShape):
         # Remove time remaining with shield
         self.shield_time_remaining -= dt
         print(f"time: {self.shield_time_remaining}, hits: {self.shield_hits_remaining}")
+        
         # If no more time, or the shield is destroyed
         if self.shield_time_remaining <= 0 or self.shield_hits_remaining == 0:
             self.activated = not self.activated
             self.kill()
             
+        if self.shield_hit_cooldown > 0:
+            self.color = "red"
+        else:
+            self.color = "orange"
+            
     def refresh(self) -> None:
         # Reset shield values
         self.shield_hits_remaining = SHIELD_MAX_HIT
         self.shield_time_remaining = SHIELD_TIME
+        
+    def hit(self) -> bool:
+        if self.shield_hit_cooldown <= 0:
+            self.shield_hits_remaining -= 1
+            self.shield_hit_cooldown = PLAYER_HIT_COOLDOWN
+            return True
+        return False

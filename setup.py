@@ -48,7 +48,7 @@ def setup_groups() -> dict[str, pygame.sprite.Group]:
     groups["updatable"] = pygame.sprite.Group()
     groups["drawable"] = pygame.sprite.Group()
     groups["asteroids"] = pygame.sprite.Group()
-    groups["shots"] = pygame.sprite.Group()
+    groups["asteroid_interactors"] = pygame.sprite.Group()
     groups["powerup_items"] = pygame.sprite.Group()
     groups["explosion_radii"] = pygame.sprite.Group()
         
@@ -60,12 +60,12 @@ def assign_containers(g) -> None:
     
     asteroidfield.AsteroidField.containers = (g["updatable"]) # AstroidField class -> updatable
     player.Player.containers = (g["updatable"], g["drawable"]) # Player class -> updatable and drawable groups
-    shot.Shot.containers = (g["updatable"], g["drawable"], g["shots"]) # Shot class -> updatable, drawable, shots
+    shot.Shot.containers = (g["updatable"], g["drawable"], g["asteroid_interactors"]) # Shot class -> updatable, drawable, shots
     asteroid.Asteroid.containers = (g["updatable"], g["drawable"], g["asteroids"]) # Astroid class -> updatable, drawable and asteroids
     powerups.Bomb.containers = (g["updatable"], g["drawable"], g["powerup_items"]) # Bomb class -> updatable, drawable, powerups
     powerups.BombExplosion.containers = (g["updatable"], g["drawable"], g["explosion_radii"])
     powerups.ShieldPowerupItem.containers = (g["updatable"], g["drawable"], g["powerup_items"])
-    player.ShieldPowerup.containers = (g["updatable"], g["drawable"])
+    player.ShieldPowerup.containers = (g["updatable"], g["drawable"], g["asteroid_interactors"])
     
 # Music on/off
 def toggle_music() -> None:
