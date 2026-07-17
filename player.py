@@ -6,7 +6,10 @@ from constants import (
     PLAYER_SHOT_COOLDOWN_SECONDS,
     PLAYER_SPEED,
     PLAYER_TURN_SPEED,
-    PLAYER_HIT_COOLDOWN
+    PLAYER_HIT_COOLDOWN,
+    SHIELD_RADIUS,
+    SHIELD_MAX_HIT,
+    SHIELD_TIME
 )
 from shot import Shot
 import pygame
@@ -26,6 +29,7 @@ class Player(CircleShape):
         self.player_lives = 3
         self.color = "white"
         self.hit_cooldown = 0
+        self.active_shield = None
 
     # Simply create triangle points
     def triangle(self) -> TriangleShape:
@@ -65,6 +69,12 @@ class Player(CircleShape):
             self.color = "red"
         else:
             self.color = "white"
+        
+        # If a shield has been assigned    
+        if self.active_shield is not None:
+            self.active_shield.position = self.position # Update the position to player position
+            if not self.active_shield.activated: # If shield has been removed
+                self.active_shield = None # Remove link to player
         
     # Move back and forward
     def move(self, dt: float) -> None:
@@ -113,5 +123,43 @@ class Player(CircleShape):
             self.hit_cooldown = PLAYER_HIT_COOLDOWN
             
         return death_channel
+    
+    # Add an effect to the player
+    def player_effect_add(self, effect: str) -> None:
+        # Add a shield if there is none, else just refresh the timing
+        if effect == "shield":
+            if self.active_shield is None:
+                self.active_shield = ShieldPowerup(self.position.x, self.position.y)
+            else:
+                self.active_shield.refresh()
 
             
+class ShieldPowerup(CircleShape):
+    # shield activate sound effect
+    # shield hit sound effect
+    # shield break sound effect
+    # shield out of time sound effect
+    
+    def __init__(self, x, y) -> None:
+        super().__init__(x, y, radius = SHIELD_RADIUS)
+        self.activated = True
+        self.shield_time_remaining = SHIELD_TIME
+        self.shield_hits_remaining = SHIELD_MAX_HIT
+        self.shield_hit_cooldown = PLAYER_HIT_COOLDOWN
+        
+    def draw(self, screen: pygame.Surface) -> None:
+        pygame.draw.circle(screen, "orange", self.position, self.radius, LINE_WIDTH)
+
+    def update(self, dt: float) -> None:
+        # Remove time remaining with shield
+        self.shield_time_remaining -= dt
+        print(f"time: {self.shield_time_remaining}, hits: {self.shield_hits_remaining}")
+        # If no more time, or the shield is destroyed
+        if self.shield_time_remaining <= 0 or self.shield_hits_remaining == 0:
+            self.activated = not self.activated
+            self.kill()
+            
+    def refresh(self) -> None:
+        # Reset shield values
+        self.shield_hits_remaining = SHIELD_MAX_HIT
+        self.shield_time_remaining = SHIELD_TIME

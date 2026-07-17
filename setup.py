@@ -64,7 +64,9 @@ def assign_containers(g) -> None:
     asteroid.Asteroid.containers = (g["updatable"], g["drawable"], g["asteroids"]) # Astroid class -> updatable, drawable and asteroids
     powerups.Bomb.containers = (g["updatable"], g["drawable"], g["powerup_items"]) # Bomb class -> updatable, drawable, powerups
     powerups.BombExplosion.containers = (g["updatable"], g["drawable"], g["explosion_radii"])
-
+    powerups.ShieldPowerupItem.containers = (g["updatable"], g["drawable"], g["powerup_items"])
+    player.ShieldPowerup.containers = (g["updatable"], g["drawable"])
+    
 # Music on/off
 def toggle_music() -> None:
     

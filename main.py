@@ -90,7 +90,7 @@ def main() -> None:
             # Checks for any item/powerup collision with player
             for item in container_groups["powerup_items"]:
                 if collides(player1, item):
-                    item.activate()
+                    item.activate(player1)
         
         #* If player has died            
         elif game_state == "death_pause":

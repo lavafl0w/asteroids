@@ -3,6 +3,7 @@ import pygame
 # Base class for game objects
 class CircleShape(pygame.sprite.Sprite):
     containers: tuple[pygame.sprite.Group, ...]
+    hitbox_kind = "circle"
 
     def __init__(self, x: float, y: float, radius: float) -> None:
         # we will be using this later
@@ -14,7 +15,7 @@ class CircleShape(pygame.sprite.Sprite):
         self.position: pygame.Vector2 = pygame.Vector2(x, y)
         self.velocity = pygame.Vector2(0, 0)
         self.radius = radius
-        self.hitbox_kind = "circle"
+
 
     def draw(self, screen: pygame.Surface) -> None:
         # must override
