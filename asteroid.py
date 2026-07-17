@@ -1,5 +1,5 @@
 from circleshape import CircleShape
-from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH, BOMB_SPAWN_CHANCE, SHIELD_SPAWN_CHANCE, SHIELD_RADIUS
+from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH, BOMB_SPAWN_CHANCE, SHIELD_SPAWN_CHANCE
 from powerups import Bomb, ShieldPowerupItem
 from scorekeeper import ScoreKeeper
 import pygame
@@ -54,15 +54,17 @@ class Asteroid(CircleShape):
         # Create new asteroids at current position, use the new radius and apply velocity
         Asteroid(self.position.x, self.position.y, new_radius).velocity = new_velocity_1 * 1.2
         Asteroid(self.position.x, self.position.y, new_radius).velocity = new_velocity_2 * 1.2
+    
+    # Handles bouncing the direction of the asteroid away   
+    def bounce(self, bounce_object: CircleShape) -> None:
+        # Gets a vector (normal) that points away from other object
+        push_direction_vector = self.position - bounce_object.position
         
-    def bounce(self, player_pos):
-
-        push_direction_vector = self.position - player_pos
-        centre_distance = self.position.distance_to(player_pos)
-        overlap = (SHIELD_RADIUS + self.radius) - centre_distance
+        # Gets the distance and gets the overlap amount
+        centre_distance = self.position.distance_to(bounce_object.position)
+        overlap = (bounce_object.radius + self.radius) - centre_distance
         
-        if overlap > 0:
-            self.position += push_direction_vector.normalize() * overlap
-
-        print(self.velocity)
+        # Make the new position a spot away from the other object
+        # in the other direction
+        self.position += push_direction_vector.normalize() * overlap
         

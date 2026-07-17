@@ -16,4 +16,4 @@ class Shot(CircleShape):
         
     def hit(self) -> bool:
         self.kill()
-        return True
+        return True # Has to return True because of the asteroid.split()/bounce() logic

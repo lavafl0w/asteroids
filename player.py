@@ -9,7 +9,8 @@ from constants import (
     PLAYER_HIT_COOLDOWN,
     SHIELD_RADIUS,
     SHIELD_MAX_HIT,
-    SHIELD_TIME
+    SHIELD_ACTIVE_TIME,
+    SHIELD_HIT_COOLDOWN
 )
 from shot import Shot
 import pygame
@@ -121,58 +122,88 @@ class Player(CircleShape):
             # Remove life and reset cooldown
             self.player_lives -= 1
             self.hit_cooldown = PLAYER_HIT_COOLDOWN
-            
+        
+        # Returns the channel so main.py can tell the player died    
         return death_channel
     
     # Add an effect to the player
     def player_effect_add(self, effect: str) -> None:
-        # Add a shield if there is none, else just refresh the timing
+        
+        # Add a shield if there is none
         if effect == "shield":
             if self.active_shield is None:
                 self.active_shield = ShieldPowerup(self.position.x, self.position.y)
-            else:
+            else: # We already have a shield so refresh the values
                 self.active_shield.refresh()
 
             
 class ShieldPowerup(CircleShape):
-    # shield activate sound effect
-    # shield hit sound effect
-    # shield break sound effect
-    # shield out of time sound effect
+    shield_activate_effect: pygame.mixer.Sound | None = None
+    shield_deactivate_effect: pygame.mixer.Sound | None = None
+    shield_hit_effect: pygame.mixer.Sound | None = None
+    shield_break_effect: pygame.mixer.Sound | None = None
     
     def __init__(self, x, y) -> None:
         super().__init__(x, y, radius = SHIELD_RADIUS)
         self.activated = True
-        self.shield_time_remaining = SHIELD_TIME
+        self.shield_time_remaining = SHIELD_ACTIVE_TIME
         self.shield_hits_remaining = SHIELD_MAX_HIT
         self.shield_hit_cooldown = 0
+        self.color = "orange"
+        
+        if self.shield_activate_effect is not None:
+            self.shield_activate_effect.play()
         
     def draw(self, screen: pygame.Surface) -> None:
-        pygame.draw.circle(screen, "orange", self.position, self.radius, LINE_WIDTH)
+        pygame.draw.circle(screen, self.color, self.position, self.radius, LINE_WIDTH)
 
     def update(self, dt: float) -> None:
-        # Remove time remaining with shield
+        # Remove time remaining and cooldown of shield
         self.shield_time_remaining -= dt
-        print(f"time: {self.shield_time_remaining}, hits: {self.shield_hits_remaining}")
+        self.shield_hit_cooldown -= dt
         
-        # If no more time, or the shield is destroyed
-        if self.shield_time_remaining <= 0 or self.shield_hits_remaining == 0:
-            self.activated = not self.activated
-            self.kill()
+        # If no more time available with the shield
+        if self.shield_time_remaining <= 0:
+            self.shield_deactivate()
+            if self.shield_deactivate_effect is not None:
+                self.shield_deactivate_effect.play()
             
         if self.shield_hit_cooldown > 0:
             self.color = "red"
         else:
             self.color = "orange"
-            
-    def refresh(self) -> None:
-        # Reset shield values
-        self.shield_hits_remaining = SHIELD_MAX_HIT
-        self.shield_time_remaining = SHIELD_TIME
+    
+    # Switch shield being activated and kills it        
+    def shield_deactivate(self) -> None:
+            self.activated = not self.activated
+            self.kill()
         
+    # Refresh shield values if picked up again
+    def refresh(self) -> None:
+        self.shield_hits_remaining = SHIELD_MAX_HIT
+        self.shield_time_remaining = SHIELD_ACTIVE_TIME
+        
+    # Shield has been hit
     def hit(self) -> bool:
-        if self.shield_hit_cooldown <= 0:
-            self.shield_hits_remaining -= 1
-            self.shield_hit_cooldown = PLAYER_HIT_COOLDOWN
+        # If shield is available
+        if self.shield_hit_cooldown <= 0: 
+            self.shield_hits_remaining -= 1 # Remove a hit
+            
+            # If that was the final hit
+            if self.shield_hits_remaining == 0:
+                self.shield_deactivate() # Deactivate it
+                if self.shield_break_effect is not None:
+                    self.shield_break_effect.play() # Play break sound
+                    
+                return True
+            
+            # It wasn't the final hit, so play hit sound
+            if self.shield_hit_effect is not None:
+                self.shield_hit_effect.play()
+                
+            # Set cooldown    
+            self.shield_hit_cooldown = SHIELD_HIT_COOLDOWN    
             return True
+        
+        # Return false for no shield damage so main can call asteroid.bounce() instead
         return False
