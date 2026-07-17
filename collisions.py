@@ -5,35 +5,39 @@ import pygame
 # COLLISION LOGIC #
 
 # Master Collision Check / Router
-def collides(shape_1: CircleShape, shape_2: CircleShape) -> bool:
+def collides(shape_1: CircleShape, shape_2: CircleShape) -> bool | None:
     '''
     This is the collision check dispatcher to keep things simple.
-    For now, pass arguments in one of the supported orders:
-    triangle -> circle, triangle -> rect, circle -> circle, or circle -> rect.
+    Takes the arguments passed in and if no result, flips them and tries again.
     '''
-    match shape_1.hitbox_kind, shape_2.hitbox_kind:
-        case "circle", "circle":
-            return circle_overlaps_circle(
-                cast(CircleShape, shape_1.get_hitbox()),
-                cast(CircleShape, shape_2.get_hitbox()),
-            )
-        case "circle", "rect":
-            return circle_overlaps_rect(
-                cast(CircleShape, shape_1.get_hitbox()),
-                cast(pygame.Rect, shape_2.get_hitbox()),
-            )
-        case "triangle", "circle":
-            return triangle_overlaps_circle(
-                cast(TriangleShape, shape_1.get_hitbox()),
-                cast(CircleShape, shape_2.get_hitbox()),
-            )
-        case "triangle", "rect":
-            return triangle_overlaps_rect(
-                cast(TriangleShape, shape_1.get_hitbox()),
-                cast(pygame.Rect, shape_2.get_hitbox()),
-            )
-        case _:
-            raise NotImplementedError(f"Collision case not found for object_1: {shape_1.__class__.__name__} and object_2: {shape_2.__class__.__name__}")
+    attempt = 0
+    while attempt < 2:
+        match shape_1.hitbox_kind, shape_2.hitbox_kind:
+            case "circle", "circle":
+                return circle_overlaps_circle(
+                    cast(CircleShape, shape_1.get_hitbox()),
+                    cast(CircleShape, shape_2.get_hitbox()),
+                )
+            case "circle", "rect":
+                return circle_overlaps_rect(
+                    cast(CircleShape, shape_1.get_hitbox()),
+                    cast(pygame.Rect, shape_2.get_hitbox()),
+                )
+            case "triangle", "circle":
+                return triangle_overlaps_circle(
+                    cast(TriangleShape, shape_1.get_hitbox()),
+                    cast(CircleShape, shape_2.get_hitbox()),
+                )
+            case "triangle", "rect":
+                return triangle_overlaps_rect(
+                    cast(TriangleShape, shape_1.get_hitbox()),
+                    cast(pygame.Rect, shape_2.get_hitbox()),
+                )
+            case _:
+                if attempt == 1: # If this is the second pass after they were flipped
+                    raise NotImplementedError(f"Collision case not found for object_1: {shape_1.__class__.__name__} and object_2: {shape_2.__class__.__name__}")
+                shape_1, shape_2 = shape_2, shape_1 # Flip them about
+                attempt += 1
     
 # Bomb Explosion / Asteroid -- Circle / Circle
 def circle_overlaps_circle(circle_1: CircleShape, circle_2: CircleShape) -> bool:
