@@ -33,9 +33,9 @@ class Asteroid(CircleShape):
             ScoreKeeper.asteroid_was_shot()
             
             # NOTE: This is where the powerup drop logic will live
-            #if random.randrange(0, 100) < BOMB_SPAWN_CHANCE: # If this should be a bomb
-            #    Bomb(self.position.x, self.position.y)
-            #    return # Return after so multiple powerups don't spawn
+            if random.randrange(0, 100) < BOMB_SPAWN_CHANCE: # If this should be a bomb
+                Bomb(self.position.x, self.position.y)
+                return # Return after so multiple powerups don't spawn
             
             if random.randrange(0, 100) < SHIELD_SPAWN_CHANCE: # If this should be a shield
                 ShieldPowerupItem(self.position.x, self.position.y)

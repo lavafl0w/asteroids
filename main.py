@@ -114,7 +114,7 @@ def main() -> None:
             item.draw(screen)
         
         # Apply the hud surface to the display over all the drawn sprites
-        screen.blit(hud.hud_surface, (10,10))
+        #screen.blit(hud.hud_surface, (10,10))
 
         # After all events/checks are done
         pygame.display.flip() # Refresh display
