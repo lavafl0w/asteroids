@@ -97,8 +97,6 @@ class Bomb(BaseItemPowerup):
             self.time_until_despawn = self.time_before_detonation # This is so the bomb flashes faster on trigger
             if Bomb.countdown_sound is not None: # Play the first beep as it doesn't look right without it
                 Bomb.countdown_sound.play()
-            return True
-        return False
 
     def update(self, dt: float) -> None:
         # Item hasn't been activated yet
