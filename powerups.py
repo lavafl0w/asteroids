@@ -25,12 +25,12 @@ class BaseItemPowerup(CircleShape):
         self.is_visible = True
     
     # Helper for if item has been activated    
-    def activate(self, player: Player | None = None) -> bool:
+    def activate(self, player: Player | None = None) -> bool | None:
         if self.is_activated:
-            return False # It's already been activated
+            return False # It's already been activated, so it didn't get activated again
         self.is_activated = True
         ScoreKeeper.item_was_picked_up()
-        return True
+        return True # Item was activated
     
     # Helper for changing the color of the item and starts it flashing    
     def update_warning_blink(self, dt: float) -> None:
@@ -90,7 +90,7 @@ class Bomb(BaseItemPowerup):
             pygame.draw.rect(screen, self.color, self.get_item_shape())
     
     # Call parent activate function and set despawn time to 3
-    def activate(self, player: Player | None = None) -> bool:
+    def activate(self, player: Player | None = None) -> bool | None:
         if super().activate(): # Bomb got activated 
             ScoreKeeper.bomb_was_activated()
             self.color = "red"
@@ -157,17 +157,16 @@ class ShieldPowerupItem(BaseItemPowerup):
         super().__init__(x, y, SHIELD_ITEM_PICKUP_RADIUS)
       
     def draw(self, screen: pygame.Surface) -> None:
-        if self.is_visible:
+        if self.is_visible: # Needed for flashing despawn
             pygame.draw.circle(screen, self.color, self.position, self.radius, 0)
 
     def update(self, dt: float) -> None:
-        if not self.is_activated:
+        if not self.is_activated: # It's not been picked up
             super().handle_despawn(dt)
     
-    def activate(self, player: Player | None = None) -> bool:
-        if player:
-            player.player_effect_add("shield")
-            super().activate()
-            self.kill()
-            return True
-        return False
+    def activate(self, player: Player | None = None) -> bool | None:
+        if player: # Needed just cause player might also be None
+            player.player_effect_add("shield") # Call function from Player class
+            super().activate() # Deal with main activation
+            self.kill() # Remove from screen
+            
