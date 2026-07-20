@@ -33,6 +33,7 @@ class Player(CircleShape):
         self.color = "white"
         self.hit_cooldown = 0
         self.active_shield = None
+        self.bullets_fired = 0
 
     # Simply create triangle points
     def triangle(self) -> TriangleShape:
@@ -64,14 +65,19 @@ class Player(CircleShape):
         if keys[pygame.K_SPACE]: # Shoot - Key: Space
             self.shoot()
         
-        # Reduce velocity by drag factor and apply it to the position
+        # Reduce velocity by drag factor
         self.velocity *= FRICTION_DRAG
+        
+        # Get current speed and clamp it to the max
         current_speed = self.velocity.length()
         if current_speed > PLAYER_MAX_SPEED:
             self.velocity *= (PLAYER_MAX_SPEED / current_speed)
         
+        # Make the position based off the calculated velocity
         self.position += self.velocity * dt
         
+        # Keep track of values from player
+        ScoreKeeper.track_player_values(self.player_lives, self.bullets_fired)
         
         # Decrease any cooldowns    
         self.shot_cooldown -= dt
@@ -114,7 +120,8 @@ class Player(CircleShape):
                 self.shot_audio.play()
             
             self.shot_cooldown = PLAYER_SHOT_COOLDOWN_SECONDS # Set shot cooldown to max
-            ScoreKeeper.shot_was_shot()
+            
+            self.bullets_fired += 1
             
     def get_hitbox(self) -> TriangleShape:
         return self.triangle()

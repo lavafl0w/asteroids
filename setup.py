@@ -10,7 +10,7 @@ def setup_pygame() -> tuple[pygame.Surface, pygame.time.Clock, pygame.font.Font]
     pygame.mixer.init()
         
     # Set up which font to use
-    font = pygame.font.SysFont(None, 36)
+    font = pygame.font.SysFont(None, 20)
     
     # Creates an internal clock
     pygame_clock = pygame.time.Clock()

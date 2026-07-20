@@ -33,7 +33,7 @@ def main() -> None:
     dt = 0.0
     
     # HUD display
-    hud = HUD()
+    hud = HUD(font)
     
     # Object Creation
     player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
@@ -60,6 +60,9 @@ def main() -> None:
         
             # Update all things updatable with the time since last frame (dt)
             container_groups["updatable"].update(dt)
+            
+            # Update HUD values from ScoreKeeper
+            hud.update_hud()
 
             #* GAME EVENTS #
             # Checks any asteroid/asteroid collision
@@ -114,7 +117,7 @@ def main() -> None:
             item.draw(screen)
         
         # Apply the hud surface to the display over all the drawn sprites
-        #screen.blit(hud.hud_surface, (10,10))
+        screen.blit(hud.hud_surface, (10,10))
 
         # After all events/checks are done
         pygame.display.flip() # Refresh display

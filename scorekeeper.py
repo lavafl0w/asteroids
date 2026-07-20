@@ -22,12 +22,14 @@ class ScoreKeeperClass:
     asteroids_exploded:int = 0 # Total asteroids destroyed by bomb explosion
     items_picked_up:int = 0 # How many total items picked up // right now, this also includes bombs
     bombs_activated:int = 0 # How many bombs got activated
+    player_lives: int = 0 # Current player lives
 
     def tick_time(self, dt:float) -> None:
         self.time_passed += dt
 
-    def shot_was_shot(self) -> None:
-        self.bullets_fired += 1
+    def track_player_values(self, lives: int, shots: int) -> None:
+        self.player_lives = lives
+        self.bullets_fired = shots
         
     def asteroid_was_shot(self) -> None:
         self.asteroids_shot += 1
