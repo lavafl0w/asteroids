@@ -35,6 +35,9 @@ def main() -> None:
     # HUD display
     hud = HUD(font)
     
+    # Load background image
+    background = pygame.image.load("assets/space_background.png")
+    
     # Object Creation
     player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
     field = AsteroidField() # Creates asteroid field
@@ -50,8 +53,11 @@ def main() -> None:
             if event.type == pygame.QUIT:
                 return
 
-        # Background set
-        screen.fill("black")
+        # Background wipe for redrawing
+        #screen.fill("black")
+        
+        # Use background image 
+        screen.blit(background, (0,0))
         
         #* Normal gameplay
         if game_state == "playing":
