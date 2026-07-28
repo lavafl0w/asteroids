@@ -36,10 +36,9 @@ class Asteroid(CircleShape):
         if self.radius <= ASTEROID_MIN_RADIUS:
             ScoreKeeper.asteroid_was_shot()
             
-            #// NOTE: This is where the powerup drop logic will live
             # NOTE: Powerup drop logic now lives in powerups.py
-            check_powerup_drop(self.position)           
-
+            check_powerup_drop(self.position) # Roll for a possible powerup
+            
             return
 
         new_rotation = random.uniform(20, 50)

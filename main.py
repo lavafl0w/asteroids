@@ -5,10 +5,7 @@ from hud import HUD
 import setup
 # CLASS IMPORTS
 from player import Player
-#//from asteroid import Asteroid
 from asteroidfield import AsteroidField
-#//from shot import Shot
-#//from powerups import Bomb, BombExplosion
 from scorekeeper import ScoreKeeper
 # SYSTEM IMPORTS
 import pygame

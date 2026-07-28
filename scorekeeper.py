@@ -1,4 +1,4 @@
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 
 '''
 This is the scorekeeping module. It keeps score of things (in both senses). It should keep track of things like:
@@ -42,9 +42,6 @@ class ScoreKeeperClass:
         
     def item_was_picked_up(self) -> None:
         self.items_picked_up += 1
-        
-    #def get_score_keeper_values(self) -> dict[str, int | float]:
-    #    return asdict(self) # Return all the attributes as a dictionary if needed
 
 # Used to refer back to the same object to track updating values
 ScoreKeeper = ScoreKeeperClass()
