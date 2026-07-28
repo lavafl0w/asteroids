@@ -6,14 +6,10 @@ class HUD:
         self.hud_surface:pygame.Surface = pygame.Surface((200, 150))
         self.hud_color = "black"
         self.hud_surface.fill(self.hud_color)
-        #self.time_played = 0
-        #self.bullets_shot = 0
         self.font_object = font_obj
         
     # Retrieve values from ScoreKeeper, updates then draws
     def update_hud(self) -> None:
-        #self.player_lives = ScoreKeeper.player_lives
-        #self.bullets_shot = ScoreKeeper.bullets_fired
         
         self.draw_hud()
         

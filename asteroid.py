@@ -1,6 +1,6 @@
 from circleshape import CircleShape
-from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH, BOMB_SPAWN_CHANCE, SHIELD_SPAWN_CHANCE, HEALTH_SPAWN_CHANCE
-from powerups import Bomb, ShieldPowerupItem, HealthPickup
+from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH
+from powerups import check_powerup_drop
 from scorekeeper import ScoreKeeper
 import pygame
 import random
@@ -36,19 +36,9 @@ class Asteroid(CircleShape):
         if self.radius <= ASTEROID_MIN_RADIUS:
             ScoreKeeper.asteroid_was_shot()
             
-            # NOTE: This is where the powerup drop logic will live
-            # TODO: Drop checks are ordered, so shield only rolls if bomb does not drop.
-            if random.randrange(0, 100) < BOMB_SPAWN_CHANCE: # If this should be a bomb
-                Bomb(self.position.x, self.position.y)
-                return # Return after so multiple powerups don't spawn
-            
-            if random.randrange(0, 100) < SHIELD_SPAWN_CHANCE: # If this should be a shield
-                ShieldPowerupItem(self.position.x, self.position.y)
-                return # Return after so multiple powerups don't spawn
-            
-            if random.randrange(0, 100) < HEALTH_SPAWN_CHANCE: # If this should be health
-                HealthPickup(self.position.x, self.position.y)
-                return # Return after so multiple powerups don't spawn
+            #// NOTE: This is where the powerup drop logic will live
+            # NOTE: Powerup drop logic now lives in powerups.py
+            check_powerup_drop(self.position)           
 
             return
 

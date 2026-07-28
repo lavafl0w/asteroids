@@ -1,11 +1,13 @@
 import pygame
+import random
 from circleshape import CircleShape
 from constants import (
     ITEM_WIDTH, ITEM_HEIGHT, LINE_WIDTH,
     TIME_LEFT_BEFORE_ITEM_DESPAWN,
     BOMB_DETONATE_COUNTDOWN_TIME, MAX_BOMB_EXPLOSION_TIME, BOMB_EXPLOSION_RADIUS_EXPANSION,
     SHIELD_ITEM_PICKUP_RADIUS, 
-    HEALTH_PICKUP_RADIUS
+    HEALTH_PICKUP_RADIUS,
+    BOMB_SPAWN_CHANCE, SHIELD_SPAWN_CHANCE, HEALTH_SPAWN_CHANCE
 )
 from scorekeeper import ScoreKeeper
 from player import Player
@@ -193,7 +195,32 @@ class HealthPickup(BaseItemPowerup):
             
     # Call player effect method to add life before removing itself
     def activate(self, player: Player | None = None) -> bool | None:
-            if player: # Needed just cause player might also be None
-                player.player_effect_add("health") # Call function from Player class
-                super().activate() # Deal with main activation
-                self.kill() # Remove from screen
+        if player: # Needed just cause player might also be None
+            player.player_effect_add("health") # Call function from Player class
+            super().activate() # Deal with main activation
+            self.kill() # Remove from screen
+                
+                
+def check_powerup_drop(asteroid_position) -> None:
+    '''
+    This decides if a powerup should drop based on simple table roll.
+    
+    item_1 = bomb
+    item_2 = shield
+    item_3 = health
+    
+    Leaving a 30% chance for any item to spawn, each weighted the same at 10 right now.
+    '''
+    
+    roll = random.randrange(0, 100)
+    item_1_chance = BOMB_SPAWN_CHANCE  # 10
+    item_2_chance = item_1_chance + SHIELD_SPAWN_CHANCE  # 10+10 = 20
+    item_3_chance = item_2_chance + HEALTH_SPAWN_CHANCE  # 20+10 = 30
+    
+    if 0 <= roll <= item_1_chance:  # 0-10
+        Bomb(asteroid_position.x, asteroid_position.y)
+    elif item_1_chance < roll <= item_2_chance:  # 10-20
+        ShieldPowerupItem(asteroid_position.x, asteroid_position.y)
+    elif item_2_chance < roll <= item_3_chance:  # 20-30
+        HealthPickup(asteroid_position.x, asteroid_position.y)
+    

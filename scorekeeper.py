@@ -13,7 +13,7 @@ Right now, focus on just tracking the values like time, bullets, asteroids, item
 '''
 # Made it a dataclass cause why not
 # This sort just handles basically the __init__ part, automatically assigning the values like normal
-# But converting 'time_passed' to 'self.time_passed'
+# But converting 'time_passed' to 'self.time_passed' automatically outside of init
 @dataclass
 class ScoreKeeperClass:
     time_passed: float = 0.0 # Time played
