@@ -217,10 +217,10 @@ def check_powerup_drop(asteroid_position) -> None:
     item_2_chance = item_1_chance + SHIELD_SPAWN_CHANCE  # 10+10 = 20
     item_3_chance = item_2_chance + HEALTH_SPAWN_CHANCE  # 20+10 = 30
     
-    if 0 <= roll <= item_1_chance:  # 0-10
+    if roll < item_1_chance:  # 0-10
         Bomb(asteroid_position.x, asteroid_position.y)
-    elif item_1_chance < roll <= item_2_chance:  # 10-20
+    elif roll < item_2_chance:  # 10-20
         ShieldPowerupItem(asteroid_position.x, asteroid_position.y)
-    elif item_2_chance < roll <= item_3_chance:  # 20-30
+    elif roll < item_3_chance:  # 20-30
         HealthPickup(asteroid_position.x, asteroid_position.y)
     
