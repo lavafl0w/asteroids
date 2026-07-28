@@ -23,6 +23,7 @@ class Player(CircleShape):
     death_audio: pygame.mixer.Sound | None = None
     shot_audio: pygame.mixer.Sound | None = None
     player_hit_audio: pygame.mixer.Sound | None = None
+    player_low_health_audio: pygame.mixer.Sound | None = None
     player_life_pickup_audio: pygame.mixer.Sound | None = None
     player_life_maximum_audio: pygame.mixer.Sound | None = None
     
@@ -118,7 +119,7 @@ class Player(CircleShape):
             # Creates, rotates and increases speed of newly created shot
             bullet.velocity = pygame.math.Vector2(0,1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
             
-            if self.shot_audio is not None: # Pew pew pew
+            if self.shot_audio: # Pew pew pew
                 self.shot_audio.play()
             
             self.shot_cooldown = PLAYER_SHOT_COOLDOWN_SECONDS # Set shot cooldown to max
@@ -136,12 +137,16 @@ class Player(CircleShape):
             # Remove life and reset cooldown
             self.player_lives -= 1
             self.hit_cooldown = PLAYER_HIT_COOLDOWN
+            
+            if self.player_lives == 1: # Low health
+                if self.player_low_health_audio:
+                    self.player_low_health_audio.play()
                 
             if self.player_lives <= 0: # Death
-                if self.death_audio is not None:
+                if self.death_audio:
                     death_channel = self.death_audio.play()
 
-            if self.player_hit_audio is not None and self.player_lives >= 1: # Oof
+            if self.player_hit_audio and self.player_lives >= 1: # Oof
                 self.player_hit_audio.play()
                 
         return death_channel # Returns the channel so main.py can tell the player died    

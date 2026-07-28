@@ -36,6 +36,7 @@ def setup_audio() -> None:
     player.Player.death_audio = sound_effect("assets/emotional_damage.mp3")
     player.Player.shot_audio = sound_effect("assets/pew_pew.mp3")
     player.Player.player_hit_audio = sound_effect("assets/player_hit_oof.mp3")
+    player.Player.player_low_health_audio = sound_effect("assets/fable-health-low.mp3")
     # Shield related sound effects
     player.ShieldPowerup.shield_activate_effect = sound_effect("assets/shield_attacktivate.mp3")
     player.ShieldPowerup.shield_deactivate_effect = sound_effect("assets/shield_pc-power-down.mp3")
