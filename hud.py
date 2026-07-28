@@ -7,14 +7,21 @@ class HUD:
         self.hud_color = "black"
         self.hud_surface.fill(self.hud_color)
         self.font_object = font_obj
+        self.lives_color = "white"
+        self.previous_player_lives: int | None = None
+        self.lives_change_time = 0
         
-    # Retrieve values from ScoreKeeper, updates then draws
-    def update_hud(self) -> None:
-        
+    # Updates anything needed then draws
+    def update_hud(self, dt:float) -> None:
+        self.check_life_change(dt)
         self.draw_hud()
-        
-    # Draws HUD values onto HUD screen, which then gets blitted by main.py
+    
     def draw_hud(self) -> None:
+        '''
+        This draws all the text onto the HUD screen created at __init__, and after drawing onto the HUD
+        screen that's attached to the class itself, the HUD screen gets blitted onto the main screen by main.py
+        '''
+           
         # Wipe the HUD screen before a new draw
         self.hud_surface.fill(self.hud_color)
         blit_sequence = []
@@ -28,13 +35,45 @@ class HUD:
         
         # For each line, create the text surface, and increase position by 20y per index
         for index, line in enumerate(hud_lines):
-            text_surface = self.font_object.render(line, 1, "white")
-            
+            if index == 0: # If line 0 e.g 'Lives: ...'
+                text_surface = self.font_object.render(line, 1, self.lives_color)
+            else:
+                text_surface = self.font_object.render(line, 1, "white")
+                
             # Line 0 = (10, 10) -- Line 1 = (10, 10 + (1*25)) = (10, 35)
             position = (10, 10 + (index * 25)) 
             
-            # Create a list of surface, position tuples
+            # Create a list of all the (text_surface, position) tuples
             blit_sequence.append((text_surface, position))
         
         # Draw the list of (surface, position) tuples onto the hud screen
         self.hud_surface.blits(blit_sequence)
+        
+    def check_life_change(self, dt:float) -> None:
+        '''
+        Checks the value of the player lives for if it had increased/decreased.
+        Changes the colour of the text to green/red respectively for a short time.
+        
+        After couple seconds, goes back to white.
+        '''
+        # First check on run to assign previous values
+        if self.previous_player_lives is None:
+            self.previous_player_lives = ScoreKeeper.player_lives
+            
+        current_lives = ScoreKeeper.player_lives
+        # Picked up life
+        if current_lives > self.previous_player_lives:
+            self.lives_color = "green"
+            self.lives_change_time = 2    
+        # Got hit
+        elif current_lives < self.previous_player_lives:
+            self.lives_color = "red"
+            self.lives_change_time = 2
+        
+        # Colour change timer ran out
+        if self.lives_change_time <= 0:
+            self.lives_color = "white"
+        
+        # Sets new previous and decrements time
+        self.previous_player_lives = current_lives
+        self.lives_change_time -= dt

@@ -64,8 +64,8 @@ def main() -> None:
             # Update all things updatable with the time since last frame (dt)
             container_groups["updatable"].update(dt)
             
-            # Update HUD values from ScoreKeeper
-            hud.update_hud()
+            # Update HUD values
+            hud.update_hud(dt)
 
             #* GAME EVENTS #
             #* Checks item/powerup | player collision
