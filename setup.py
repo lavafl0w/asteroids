@@ -41,6 +41,9 @@ def setup_audio() -> None:
     player.ShieldPowerup.shield_deactivate_effect = sound_effect("assets/shield_pc-power-down.mp3")
     player.ShieldPowerup.shield_break_effect = sound_effect("assets/shield_minecraft-glass-break.mp3")
     player.ShieldPowerup.shield_hit_effect = sound_effect("assets/shield_tf2-critical-hit.mp3")
+    # Health related sound effects
+    player.Player.player_life_maximum_audio = sound_effect("assets/maximum-patrona-lifes.mp3")
+    player.Player.player_life_pickup_audio = sound_effect("assets/extra-lifee.mp3")
     # Bomb related sound effects
     powerups.Bomb.explosion_sound = sound_effect("assets/explosion.mp3")
     powerups.Bomb.countdown_sound = sound_effect("assets/bomb_countdown_beep.mp3")
@@ -65,13 +68,16 @@ def setup_groups() -> dict[str, pygame.sprite.Group]:
 def assign_containers(g) -> None:
     
     asteroidfield.AsteroidField.containers = (g["updatable"])
-    player.Player.containers = (g["updatable"], g["drawable"])
-    shot.Shot.containers = (g["updatable"], g["drawable"], g["asteroid_interactors"])
     asteroid.Asteroid.containers = (g["updatable"], g["drawable"], g["asteroids"])
+    
+    player.Player.containers = (g["updatable"], g["drawable"])
+    player.ShieldPowerup.containers = (g["updatable"], g["drawable"], g["asteroid_interactors"])
+    shot.Shot.containers = (g["updatable"], g["drawable"], g["asteroid_interactors"])
+    
     powerups.Bomb.containers = (g["updatable"], g["drawable"], g["powerup_items"])
     powerups.BombExplosion.containers = (g["updatable"], g["drawable"], g["explosion_radii"])
     powerups.ShieldPowerupItem.containers = (g["updatable"], g["drawable"], g["powerup_items"])
-    player.ShieldPowerup.containers = (g["updatable"], g["drawable"], g["asteroid_interactors"])
+    powerups.HealthPickup.containers = (g["updatable"], g["drawable"], g["powerup_items"])
     
 # Music on/off
 def toggle_music() -> None:

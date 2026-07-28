@@ -23,6 +23,8 @@ class Player(CircleShape):
     death_audio: pygame.mixer.Sound | None = None
     shot_audio: pygame.mixer.Sound | None = None
     player_hit_audio: pygame.mixer.Sound | None = None
+    player_life_pickup_audio: pygame.mixer.Sound | None = None
+    player_life_maximum_audio: pygame.mixer.Sound | None = None
     
     def __init__(self, x: float, y:float) -> None:
         super().__init__(x, y, PLAYER_RADIUS)
@@ -142,12 +144,7 @@ class Player(CircleShape):
             if self.player_hit_audio is not None and self.player_lives >= 1: # Oof
                 self.player_hit_audio.play()
                 
-        return death_channel
-                
-
-        
-        # Returns the channel so main.py can tell the player died    
-        #return death_channel
+        return death_channel # Returns the channel so main.py can tell the player died    
     
     # Add an effect to the player
     def player_effect_add(self, effect: str) -> None:
@@ -158,6 +155,15 @@ class Player(CircleShape):
                 self.active_shield = ShieldPowerup(self.position.x, self.position.y)
             else: # We already have a shield so refresh the values
                 self.active_shield.refresh()
+        if effect == "health":
+            if self.player_lives <= 4:  # Add lives up to max of 5
+                self.player_lives += 1
+                if self.player_life_pickup_audio:
+                    self.player_life_pickup_audio.play() # Play life pickup audio
+                return
+            if self.player_life_maximum_audio:
+                self.player_life_maximum_audio.play() # Play max health audio instead
+                
 
             
 class ShieldPowerup(CircleShape):

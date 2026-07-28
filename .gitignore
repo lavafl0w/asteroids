@@ -14,6 +14,7 @@ game_state.jsonl
 game_events.jsonl
 debug_flags_local.py
 assets/unused
+temp.py
 
 # Remove .md notes, keeping readme.me
 *.md

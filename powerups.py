@@ -1,14 +1,11 @@
 import pygame
 from circleshape import CircleShape
 from constants import (
-    BOMB_DETONATE_COUNTDOWN_TIME,
+    ITEM_WIDTH, ITEM_HEIGHT, LINE_WIDTH,
     TIME_LEFT_BEFORE_ITEM_DESPAWN,
-    MAX_BOMB_EXPLOSION_TIME,
-    LINE_WIDTH,
-    BOMB_EXPLOSION_RADIUS_EXPANSION,
+    BOMB_DETONATE_COUNTDOWN_TIME, MAX_BOMB_EXPLOSION_TIME, BOMB_EXPLOSION_RADIUS_EXPANSION,
     SHIELD_ITEM_PICKUP_RADIUS, 
-    ITEM_WIDTH,
-    ITEM_HEIGHT
+    HEALTH_PICKUP_RADIUS
 )
 from scorekeeper import ScoreKeeper
 from player import Player
@@ -69,7 +66,8 @@ class BaseItemPowerup(CircleShape):
         return self
 
 class Bomb(BaseItemPowerup):
-    explosion_sound: pygame.mixer.Sound | None = None # Sound effects set at None for import, attached after
+    # Assigned sound effected after mixer init
+    explosion_sound: pygame.mixer.Sound | None = None
     countdown_sound: pygame.mixer.Sound | None = None
     width = ITEM_WIDTH
     height = ITEM_HEIGHT
@@ -167,4 +165,35 @@ class ShieldPowerupItem(BaseItemPowerup):
             player.player_effect_add("shield") # Call function from Player class
             super().activate() # Deal with main activation
             self.kill() # Remove from screen
+
+# Health/extra life            
+class HealthPickup(BaseItemPowerup):
+    hitbox_kind = "circle"
+    color = "green"
+    
+    def __init__(self, x: float, y: float) -> None:
+        super().__init__(x, y, HEALTH_PICKUP_RADIUS)
             
+    # Creates two Rects, centres them then draws both intersecting as a cross
+    def draw(self, screen: pygame.Surface) -> None:
+        if self.is_visible:
+            horizontal_rect = pygame.Rect(0,0,15,5)
+            vertical_rect = pygame.Rect(0,0,5,15)
+            
+            horizontal_rect.center = (int(self.position.x), int(self.position.y))
+            vertical_rect.center = (int(self.position.x), int(self.position.y))
+            
+            pygame.draw.rect(screen, self.color, horizontal_rect)
+            pygame.draw.rect(screen, self.color, vertical_rect)
+    
+    # Despawn logic
+    def update(self, dt:float) -> None:
+        if not self.is_activated: 
+            super().handle_despawn(dt)
+            
+    # Call player effect method to add life before removing itself
+    def activate(self, player: Player | None = None) -> bool | None:
+            if player: # Needed just cause player might also be None
+                player.player_effect_add("health") # Call function from Player class
+                super().activate() # Deal with main activation
+                self.kill() # Remove from screen
