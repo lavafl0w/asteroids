@@ -10,6 +10,7 @@ from scorekeeper import ScoreKeeper
 # SYSTEM IMPORTS
 import pygame
 import sys
+import scenemanager
 
 def main() -> None:
 
@@ -23,104 +24,29 @@ def main() -> None:
     # Get audio set up, play music and assign effects
     setup.setup_audio()
     
-    # Get the groups and sprites all ready to go
-    container_groups = setup.setup_groups()
+    scenes = scenemanager.create_scenes(font)
     
     # Delta time - track change in time between loops
     dt = 0.0
-    
-    # HUD display
-    hud = HUD(font)
-    
-    # Load background image
-    background = pygame.image.load("assets/space_background.png")
-    
-    # Object Creation
-    player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) # Create player object
-    field = AsteroidField() # Creates asteroid field
 
-    game_state = "playing"
+    game_state = "main_menu"
     death_channel: None | pygame.mixer.Channel = None
     
     #* Game Loop #
     while True:
         
+        events = pygame.event.get()
         # This makes the close button on the window work
-        for event in pygame.event.get():
+        for event in events:
             if event.type == pygame.QUIT:
                 return
+        
+        # NOTE: See scenemanager for explanation rn
+              
+        game_state = scenes[game_state].handle_events(events)
 
-        # Background wipe for redrawing
-        #screen.fill("black")
-        
-        # Use background image 
-        screen.blit(background, (0,0))
-        
-        #* NORMAL GAMEPLAY # 
-        if game_state == "playing":
-            # Increase game time
-            ScoreKeeper.tick_time(dt)
-        
-            # Update all things updatable with the time since last frame (dt)
-            container_groups["updatable"].update(dt)
-            
-            # Update HUD values
-            hud.update_hud(dt)
-
-            #* GAME EVENTS #
-            #* Checks item/powerup | player collision
-            for item in container_groups["powerup_items"]:
-                if collides(player1, item):
-                    item.activate(player1)
-            
-            #* Checks asteroid | asteroid collision (for bouncing)
-            asteroids_group = list(container_groups["asteroids"])
-            for i in range(0, len(asteroids_group)):
-                asteroid_1 = asteroids_group[i]
-                for j in range(i+1, len(asteroids_group)):
-                    asteroid_2 = asteroids_group[j]
-                    if collides(asteroid_1, asteroid_2):
-                        asteroid_1.bounce(asteroid_2)                
-
-            #* Checks any other asteroid collisions
-            for asteroid in container_groups["asteroids"]:                 
-                # Player | asteroid collision
-                if collides(player1, asteroid):
-                    death_channel = player1.asteroid_hit()
-                    if death_channel is not None: # If asteroid_hit() played sound, death_channel is no longer None
-                        setup.toggle_music() # Switch music off
-                        game_state = "death_pause"
-                        break
-
-                # Bullet/shield | asteroid collision
-                for interactor in container_groups["asteroid_interactors"]:
-                    if collides(asteroid, interactor):
-                        if interactor.hit(): # If the hit connected...            
-                            asteroid.split() # Call asteroid split logic
-                        else:
-                            asteroid.bounce(interactor) # Bounce away from it (for shield on cooldown)
-                        
-                # Bomb_explosion | asteroid collision
-                for explosion in container_groups["explosion_radii"]:
-                    if collides(asteroid, explosion):
-                        ScoreKeeper.asteroid_was_exploded()
-                        asteroid.kill()
-                        # FUTURE: To add further into keeping score mechanic, this could be different score because it was a bomb
-                        # FUTURE: and at the end have something like "Bombs used:" "Asteroids destroyed by bombs:"
-        
-        #* If player has died #             
-        elif game_state == "death_pause":
-            if death_channel is not None:
-                # If the channel is no longer playing something
-                if not death_channel.get_busy():
-                    sys.exit()
-                
-        # Draw everything on screen that can be drawn
-        for item in container_groups["drawable"]:
-            item.draw(screen)
-        
-        # Apply the hud surface to the display over all the drawn sprites
-        screen.blit(hud.hud_surface, (10,10))
+        scenes[game_state].draw(screen)
+        scenes[game_state].update(dt)
 
         # After all events/checks are done
         pygame.display.flip() # Refresh display
@@ -128,3 +54,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+ 

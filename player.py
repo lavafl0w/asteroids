@@ -6,13 +6,14 @@ from constants import (
     PLAYER_SHOT_COOLDOWN_SECONDS,
     PLAYER_MAX_SPEED,
     PLAYER_ACCELERATION,
+    PLAYER_START_LIVES,
     FRICTION_DRAG,
     PLAYER_TURN_SPEED,
     PLAYER_HIT_COOLDOWN,
     SHIELD_RADIUS,
     SHIELD_MAX_HIT,
     SHIELD_ACTIVE_TIME,
-    SHIELD_HIT_COOLDOWN
+    SHIELD_HIT_COOLDOWN,
 )
 from shot import Shot
 import pygame
@@ -32,7 +33,7 @@ class Player(CircleShape):
         self.rotation = 0
         self.shot_cooldown = 0
         self.hitbox_kind = "triangle"
-        self.player_lives = 3
+        self.player_lives = PLAYER_START_LIVES
         self.color = "white"
         self.hit_cooldown = 0
         self.active_shield = None

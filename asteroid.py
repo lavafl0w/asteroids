@@ -1,7 +1,8 @@
 from circleshape import CircleShape
-from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH
+from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH, SCREEN_WIDTH, SCREEN_HEIGHT
 from powerups import check_powerup_drop
 from scorekeeper import ScoreKeeper
+import debug_flags
 import pygame
 import random
 
@@ -12,21 +13,43 @@ class Asteroid(CircleShape):
     def __init__(self, x: float, y: float, radius: float) -> None:
         super().__init__(x, y, radius)
         self.local_point_coords: list[pygame.Vector2] = self.create_local_polygon_coords() # Create local polygon points for drawing
-    
-    # Draw circular asteroids
+        self.color = "white"
+
     def draw(self, screen: pygame.Surface) -> None:
-        world_point_coords = [self.position + point for point in self.local_point_coords]        
-        pygame.draw.polygon(screen, "white", world_point_coords, LINE_WIDTH)
-    
-    # On update: move the astroid    
+        if debug_flags.check("DEBUG_ASTEROID_POLYGON_OUTLIERS"): #!
+            self.debug_polygon_outliers()
+
+        world_point_coords = [self.position + point for point in self.local_point_coords]
+        pygame.draw.polygon(screen, self.color, world_point_coords, LINE_WIDTH)
+
+    def debug_polygon_outliers(self) -> None: #!
+        """Print if a local polygon point is suspiciously far from this asteroid."""
+        max_expected_distance = self.radius * 2
+
+        for index, local_point in enumerate(self.local_point_coords):
+            point_distance = local_point.length()
+
+            if point_distance > max_expected_distance:
+                print(
+                    "asteroid polygon outlier -> "
+                    f"center={self.position}, radius={self.radius}, "
+                    f"point_index={index}, local_point={local_point}, "
+                    f"distance_from_center={point_distance}"
+                )
+ 
     def update(self, dt: float) -> None:
         self.position += (self.velocity * dt)
-        # TODO: Replace this magic boundary with one based on screen size and asteroid radius.
-        if abs(self.position.x) > 2000 or abs(self.position.y) > 2000:
-            self.kill() # Remove asteroid if it's far outside screen boundaries
-    
-    # Handles splitting of asteroids into smaller/faster ones when hit    
+                    
+        if (    # Remove asteroid if it's far outside screen boundaries
+            self.position.x < -self.screen_boundary_margin
+            or self.position.y < -self.screen_boundary_margin
+            or self.position.x > SCREEN_WIDTH + self.screen_boundary_margin
+            or self.position.y > SCREEN_HEIGHT + self.screen_boundary_margin
+        ):  
+            self.kill() 
+
     def split(self) -> None:
+        """Handles splitting of asteroids into smaller/faster ones when hit"""
         self.kill() # Regardless of size, destroy it
         
         if Asteroid.asteroid_split_sound is not None:
@@ -35,10 +58,7 @@ class Asteroid(CircleShape):
         # This was a small asteroid
         if self.radius <= ASTEROID_MIN_RADIUS:
             ScoreKeeper.asteroid_was_shot()
-            
-            # NOTE: Powerup drop logic now lives in powerups.py
             check_powerup_drop(self.position) # Roll for a possible powerup
-            
             return
 
         new_rotation = random.uniform(20, 50)
@@ -52,62 +72,73 @@ class Asteroid(CircleShape):
         # Create new asteroids at current position, use the new radius and apply velocity
         Asteroid(self.position.x, self.position.y, new_radius).velocity = new_velocity_1 * 1.2
         Asteroid(self.position.x, self.position.y, new_radius).velocity = new_velocity_2 * 1.2
-    
-    # Handles bouncing the direction of the asteroid away   
+
     def bounce(self, bounce_object: CircleShape) -> None:
+        """Handles bouncing the direction of the asteroid away"""
         # Gets a vector (normal) that points away from other object
         push_direction_vector = self.position - bounce_object.position
         
         # Gets the distance and gets the overlap amount
         centre_distance = self.position.distance_to(bounce_object.position)
         overlap = (bounce_object.radius + self.radius) - centre_distance
+
+        if overlap > self.radius*2:
+            print(
+                    "asteroid overlap -> "
+                    f"center={self.position}, radius={self.radius}, "
+                    f"overlap={overlap}, distance={centre_distance}, "
+                    f"other center={bounce_object.position}, other radius={bounce_object.radius}"
+                )
         
+        # Guard against zero-length vectors before normalizing.
+        if push_direction_vector.length() == 0:
+            push_direction_vector = pygame.Vector2(1,0)
+        push_direction_vector.normalize_ip()
         
+        # TODO: Look at asteroid vs shield, since now both objects move
+        # HACK: If its an asteroid, split the overlap then move both
+        if isinstance(bounce_object, Asteroid):
+            overlap /= 2
+            bounce_object.position -= push_direction_vector * overlap
+            
         # Make the new position a spot away from the other object
-        # in the other direction
-        # TODO: Guard against zero-length vectors before normalizing.
-        # TODO: Asteroid/asteroid bounce currently only moves this asteroid, not both.
-        self.position += push_direction_vector.normalize() * overlap
-    
-    # TODO: Sort out comments and variable names    
+        self.position += push_direction_vector * overlap
+        
     def create_local_polygon_coords(self) -> list[pygame.Vector2]:
-        # FUTURE: Start with large, but have different no. of segments depending of size(maybe radius?)
-        '''
-        This will be the function that creates the list of local coordinates for each point around the asteroid
-        This is then stored, so the random variation doesn't change for each draw cycle.
+        """Creates a list of randomly positioned coordinates for drawing a 'rocky' asteroid shape."""
+        # FUTURE: Have different no. of segments depending on size(maybe radius?)
         
-        Asteroid is split into segments, with each segement a random local coordinate from centre
-        Asteroid position (centre) -> Vector out at an angle with length of radius (plus small randomness)
-        Points are then drawn in relation asteroid centre using world coordinate system
-        '''
-        # Asteroid is split into 30 degree chunks for 12 coordinates
-        '''
-        0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, (not 360 as this is also 0), centre is 0,0
-        '''
-        
+        # Asteroid is split into 20 degree chunks
         segement_degree_step = 20
-        local_coordinates_30_degree_12p: list[pygame.Vector2] = []
+        local_coords: list[pygame.Vector2] = []
         
-        min_random = 0.85
-        max_random = 1.12
+        min_rand_limit = 0.85
+        max_rand_limit = 1.12
         
-        random_factor = random.uniform(min_random, max_random) # Lets say this is 0.9
-        max_random_range = 0.15
+        # FUTURE: Clean up double upper/lower range calcs here and in for loop
+        random_factor = random.uniform(min_rand_limit, max_rand_limit)
+        rand_factor_range = 0.15 # How much the different factors can deviate from each other
+        upper_range = random_factor + rand_factor_range
+        lower_range = random_factor - rand_factor_range
         
         for segement_degree in range(0, 360, segement_degree_step):
+            new_factor = random.uniform(min_rand_limit, max_rand_limit)
+
+            if abs(new_factor - random_factor) > rand_factor_range: # If new factor deviates to much, clamp it
+                new_factor = min(upper_range, max(new_factor, lower_range))
             
-            new_factor = random.uniform(min_random, max_random) # This is 1.1 - We want to bring this down to 0.98
-            # TODO: This clamps to the global min/max, not to the previous factor +/- max_random_range.
-            if abs(new_factor - random_factor) > max_random_range:
-                new_factor = min(max_random, max(new_factor, min_random))
-            
+            # Store this value for next run, calculate new range
+            #FUTURE: currently, initial factor on first loop doesn't actually get used
             random_factor = new_factor
+            upper_range = random_factor + rand_factor_range
+            lower_range = random_factor - rand_factor_range
             
             base_vector = pygame.Vector2(1, 0) # Vector pointing right (eg angle 0)
-            distance_value = self.radius * random_factor
-            scaled_vector = base_vector * distance_value
-            segement_coord = scaled_vector.rotate(segement_degree)
+            distance_value = self.radius * random_factor # Work out length for vector
             
-            local_coordinates_30_degree_12p.append(segement_coord)
+            scaled_vector = base_vector * distance_value # Combine the length with vector
+            segement_coord = scaled_vector.rotate(segement_degree) # Point it towards angle
+            
+            local_coords.append(segement_coord)
         
-        return local_coordinates_30_degree_12p
+        return local_coords

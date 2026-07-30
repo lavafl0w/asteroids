@@ -8,7 +8,8 @@ That local file is gitignored, so you can flip flags there without polluting com
 # Project defaults live here.
 debug_dict = {
     "DISABLE_PLAYER_ASTEROID_HIT": False,
-    "ONLY_DRAW_SINGLE_ASTEROID": False
+    "ONLY_DRAW_SINGLE_ASTEROID": False,
+    "DEBUG_ASTEROID_POLYGON_OUTLIERS": False,
     }
 
 try:
