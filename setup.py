@@ -1,37 +1,49 @@
 import pygame
-import player, powerups, asteroid, asteroidfield, shot
+import player, powerups, asteroid, asteroidfield, shot, scenemanager
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 
-# Start Pygame instance, enables fonts and music
-def setup_pygame() -> tuple[pygame.Surface, pygame.time.Clock, pygame.font.Font]:
-
+def setup_pygame() -> tuple[pygame.Surface, pygame.time.Clock]:
+    """Start Pygame instance, creates the clock and display screen"""
     pygame.init()
-    pygame.font.init()
     pygame.mixer.init()
-        
-    # Set up which font to use
-    font = pygame.font.SysFont(None, 26)
-    
+
     # Creates an internal clock
     pygame_clock = pygame.time.Clock()
     
-    # Sets the screen to the dimensions
+    # Sets the screen to the dimensions and sets title
     screen: pygame.Surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    pygame.display.set_caption("ASTEROIDSS!!!11!111!!1!!!")
     
     # Returns these for use in main.py
-    return screen, pygame_clock, font
-    
-# Handles audio setup like music and assigning sound effects
-def setup_audio() -> None:
-    
-    # Load music and play
+    return screen, pygame_clock
+
+def start_music(scene) -> None:
+    """Load music for scene and play"""
     music = pygame.mixer.music
-    music.load('assets/music_glorious_morning.mp3')
-    music.set_volume(0.4)
-    toggle_music()
     
+    if music.get_busy():
+        toggle_music()
+        music.unload()
+    
+    if scene == "main_menu":
+        music.load('assets/music_san_andreas.mp3')
+        music.set_volume(0.6)
+        toggle_music()
+    
+    elif scene == "game_loop":
+        music.load('assets/music_glorious_morning.mp3')
+        music.set_volume(0.4)
+        toggle_music()
+
+def setup_sound_effects() -> None:
+    """Handles assigning sound effects"""    
     sound_effect = pygame.mixer.Sound
     
+    # Scenemanager sound effects
+    scenemanager.MainMenu.start_hover_audio = sound_effect("assets/route_jingle.mp3")
+    scenemanager.MainMenu.quit_hover_audio = sound_effect("assets/bruh.mp3")
+    scenemanager.MainMenu.start_press_audio = sound_effect("assets/good_boy.mp3")
+    scenemanager.MainMenu.quit_press_audio = sound_effect("assets/vine_boom.mp3")
     # Player sound effects
     player.Player.death_audio = sound_effect("assets/emotional_damage.mp3")
     player.Player.shot_audio = sound_effect("assets/pew_pew.mp3")
@@ -50,9 +62,9 @@ def setup_audio() -> None:
     powerups.Bomb.countdown_sound = sound_effect("assets/bomb_countdown_beep.mp3")
     # Asteroid related sound effects
     asteroid.Asteroid.asteroid_split_sound = sound_effect("assets/orb.mp3")
-    
-# Creates group instances, sends them to be assigned before then returning them
-def setup_groups() -> dict[str, pygame.sprite.Group]:
+
+def setup_assign_groups() -> dict[str, pygame.sprite.Group]:
+    """Creates group instances, assigns relevent class containers to them then returns for use"""
     groups = {}
     
     groups["updatable"] = pygame.sprite.Group()
@@ -65,9 +77,8 @@ def setup_groups() -> dict[str, pygame.sprite.Group]:
     assign_containers(groups)
     return groups
 
-# Assigns all the sprites into groups/containers to then be more easily used
 def assign_containers(g) -> None:
-    
+    """Assigns all the sprite containers to relevant groups to then be more easily used"""    
     asteroidfield.AsteroidField.containers = (g["updatable"])
     asteroid.Asteroid.containers = (g["updatable"], g["drawable"], g["asteroids"])
     
@@ -79,10 +90,9 @@ def assign_containers(g) -> None:
     powerups.BombExplosion.containers = (g["updatable"], g["drawable"], g["explosion_radii"])
     powerups.ShieldPowerupItem.containers = (g["updatable"], g["drawable"], g["powerup_items"])
     powerups.HealthPickup.containers = (g["updatable"], g["drawable"], g["powerup_items"])
-    
-# Music on/off
+
 def toggle_music() -> None:
-    
+    """Music on/off"""    
     if pygame.mixer.music.get_busy():
         pygame.mixer.music.stop()        
         return

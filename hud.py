@@ -2,14 +2,16 @@ import pygame
 from scorekeeper import ScoreKeeper
 
 class HUD:
-    def __init__(self, font_obj: pygame.font.Font) -> None:
+    def __init__(self) -> None:
         self.hud_surface:pygame.Surface = pygame.Surface((200, 150))
         self.hud_color = "black"
         self.hud_surface.fill(self.hud_color)
-        self.font_object = font_obj
         self.lives_color = "white"
         self.previous_player_lives: int | None = None
         self.lives_change_time = 0
+        self.font_object = pygame.font.SysFont(None, 26)
+                
+        # Create font object
         
     # Updates anything needed then draws
     def update_hud(self, dt:float) -> None:

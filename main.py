@@ -1,15 +1,8 @@
 # INTERNAL COMPONENT IMPORTS
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
-from collisions import collides
-from hud import HUD
 import setup
-# CLASS IMPORTS
-from player import Player
-from asteroidfield import AsteroidField
-from scorekeeper import ScoreKeeper
 # SYSTEM IMPORTS
 import pygame
-import sys
 import scenemanager
 
 def main() -> None:
@@ -17,20 +10,20 @@ def main() -> None:
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
 
-    # Start pygame internals and get back the screen, the clock and the font to use
-    screen, pygame_clock, font = setup.setup_pygame()
+    # Start pygame internals and get back the screen and the clock to use
+    screen, pygame_clock = setup.setup_pygame()
     
     # Get audio set up, play music and assign effects
-    setup.setup_audio()
+    setup.setup_sound_effects()
     
     #? Have a look at maybe changing the terms from scenes to something else
-    scenes = scenemanager.create_scenes(font)
+    scenes = scenemanager.create_scenes()
     
     # Delta time - track change in time between loops
     dt = 0.0
 
     game_state = "main_menu"
-    #//death_channel: None | pygame.mixer.Channel = None
+    setup.start_music("main_menu")
     
     #* Game Loop #
     while True:
@@ -44,10 +37,16 @@ def main() -> None:
               
         next_scene = scenes[game_state].handle_events(events)
         if next_scene is not None:
+            if next_scene == 'quit':
+                pygame.quit()
+                return
             game_state = next_scene
             
         next_scene = scenes[game_state].update(dt)
         if next_scene is not None:
+            if next_scene == 'quit':
+                pygame.quit()
+                return
             game_state = next_scene
             
         scenes[game_state].draw(screen)

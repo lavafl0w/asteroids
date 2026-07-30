@@ -1,4 +1,5 @@
 from circleshape import CircleShape, TriangleShape
+from typing import Literal
 from constants import (
     LINE_WIDTH,
     PLAYER_RADIUS,
@@ -130,11 +131,10 @@ class Player(CircleShape):
     def get_hitbox(self) -> TriangleShape:
         return self.triangle()
     
-    def asteroid_hit(self) -> None | pygame.mixer.Channel:
-        death_channel = None
-        
+    def asteroid_hit(self) -> None | pygame.mixer.Channel | Literal['death']:
+        """ Player was hit by asteroid """
+               
         if self.hit_cooldown <= 0:
-            
             # Remove life and reset cooldown
             self.player_lives -= 1
             self.hit_cooldown = PLAYER_HIT_COOLDOWN
@@ -145,16 +145,14 @@ class Player(CircleShape):
                 
             if self.player_lives <= 0: # Death
                 if self.death_audio:
-                    death_channel = self.death_audio.play()
+                    self.death_audio.play()
+                    return "death"
 
             if self.player_hit_audio and self.player_lives >= 1: # Oof
                 self.player_hit_audio.play()
-                
-        return death_channel # Returns the channel so main.py can tell the player died    
-    
-    # Add an effect to the player
+
     def player_effect_add(self, effect: str) -> None:
-        
+        """ Add an effect to the player """
         # Add a shield if there is none
         if effect == "shield":
             if self.active_shield is None:
@@ -169,7 +167,6 @@ class Player(CircleShape):
                 return
             if self.player_life_maximum_audio:
                 self.player_life_maximum_audio.play() # Play max health audio instead
-                
 
             
 class ShieldPowerup(CircleShape):
