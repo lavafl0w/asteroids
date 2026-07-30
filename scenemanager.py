@@ -1,6 +1,7 @@
-from typing import Literal
+from typing import Callable, List, Literal
 
 import pygame
+from pygame.event import Event
 import setup
 from player import Player
 from asteroidfield import AsteroidField
@@ -19,18 +20,26 @@ this works in reverse also with gameloop and the esc key back to main menu
 class MainMenu:
     def __init__(self, font: pygame.font.Font) -> None:
         self.menu_background = "orange"
+        self.test_button = Button(250, 250, (SCREEN_WIDTH/2, SCREEN_HEIGHT/2), font, 
+                                  "text", "red", "green", self.start_game)
                 
-    def handle_events(self, events):
+    def handle_events(self, events) -> None | Literal['game_loop']:
         for event in events:
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                return "game_loop"
-        return "main_menu"
+            return self.test_button.handle_events(event)
+        #//for event in events:
+        #//    if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+        #//        return "game_loop"
     
     def draw(self, screen: pygame.Surface) -> None:
         screen.fill(self.menu_background)
+        self.test_button.draw(screen)
     
     def update(self, dt:float) -> None:
         pass
+    
+    def start_game(self) -> Literal['game_loop']:
+        print("start")
+        return "game_loop"
 
 
 class GameLoop:
@@ -48,14 +57,12 @@ class GameLoop:
         # HUD display
         self.hud = HUD(font)
         
-    def handle_events(self, events) -> Literal['main_menu'] | Literal['game_loop']:
+    def handle_events(self, events) -> None | Literal['main_menu']:
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 return "main_menu"
-        return "game_loop"
     
     def draw(self, screen: pygame.Surface) -> None:
-
         # Use background image 
         screen.blit(self.background, (0,0))
 
@@ -65,7 +72,7 @@ class GameLoop:
         # Apply the hud surface to the display over drawn sprites
         screen.blit(self.hud.hud_surface, (10,10))
     
-    def update(self, dt:float) -> None:
+    def update(self, dt:float) -> None | Literal['death_pause']:
         # Increase game time
         ScoreKeeper.tick_time(dt)
         
@@ -96,9 +103,9 @@ class GameLoop:
             if collides(self.player1, asteroid):
                 death_channel = self.player1.asteroid_hit()
                 if death_channel is not None: # If asteroid_hit() played sound, death_channel is no longer None
-                    setup.toggle_music() # Switch music off
-                    game_state = "death_pause"
-                    break
+                    #? toggle music should probably be handled by death_pause?
+                    #//setup.toggle_music() # Switch music off
+                    return "death_pause"
 
             # Bullet/shield | asteroid collision
             for interactor in self.container_groups["asteroid_interactors"]:
@@ -116,11 +123,62 @@ class GameLoop:
                     # FUTURE: To add further into keeping score mechanic, this could be different score because it was a bomb
                     # FUTURE: and at the end have something like "Bombs used:" "Asteroids destroyed by bombs:"
 
-Scenes = dict[str, MainMenu | GameLoop]
+
+#TODO: This is just temporary death pause implementation, flesh it out
+#NOTE: Old death_channel test before exit probs wont work anymore as it stands
+#NOTE: cause death pause doesnt have access to death channel
+class DeathPause:
+    def __init__(self, font: pygame.font.Font):
+        pass
+    
+    def handle_events(self, events: List[Event]):
+        pass
+    
+    def draw(self, screen:pygame.Surface):
+        screen.fill("red")
+    
+    def update(self, dt:float):
+        setup.toggle_music()
+
+
+class Button:
+    def __init__(self, width:int, height: int, centre:tuple, font_obj:pygame.font.Font,
+                 button_text:str, base_color:str, hover_color:str, callback: Callable) -> None:
+        self.button = pygame.Rect(0, 0, width, height)
+        self.width = width
+        self.height = height
+        self.centre = centre
+        self.font = font_obj
+        self.button_text = button_text
+        self.base_color = base_color
+        self.hover_color = hover_color
+        self.callback = callback
+        self.hovered_over = False
+        
+    def handle_events(self, event: Event) -> None:
+        if event.type == pygame.MOUSEMOTION:
+            self.hovered_over = self.button.collidepoint(event.pos)
+        elif event.type == pygame.MOUSEBUTTONDOWN and self.hovered_over:
+            return self.callback()
+    
+    def draw(self, screen:pygame.Surface):
+        button = self.button
+        button.center = self.centre
+        
+        colour = self.hover_color if self.hovered_over else self.base_color
+        pygame.draw.rect(screen, colour, button)
+        #text_rect = pygame.Rect(self.button.copy())
+        
+        
+    
+    
+    
+Scenes = dict[str, MainMenu | GameLoop | DeathPause]
 def create_scenes(font) -> Scenes:
     return {
         "main_menu": MainMenu(font),
-        "game_loop": GameLoop(font)
+        "game_loop": GameLoop(font),
+        "death_pause": DeathPause(font),
     }
 
 

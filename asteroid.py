@@ -75,6 +75,7 @@ class Asteroid(CircleShape):
 
     def bounce(self, bounce_object: CircleShape) -> None:
         """Handles bouncing the direction of the asteroid away"""
+        #TODO: This 'bouncing' is more like 'sliding around' each other rn lol
         # Gets a vector (normal) that points away from other object
         push_direction_vector = self.position - bounce_object.position
         
@@ -82,7 +83,7 @@ class Asteroid(CircleShape):
         centre_distance = self.position.distance_to(bounce_object.position)
         overlap = (bounce_object.radius + self.radius) - centre_distance
 
-        if overlap > self.radius*2:
+        if overlap > self.radius*2: #!
             print(
                     "asteroid overlap -> "
                     f"center={self.position}, radius={self.radius}, "
@@ -95,7 +96,7 @@ class Asteroid(CircleShape):
             push_direction_vector = pygame.Vector2(1,0)
         push_direction_vector.normalize_ip()
         
-        # TODO: Look at asteroid vs shield, since now both objects move
+        # TODO: Look at asteroid vs shield, since now both objects move but shield shouldn't without HACK
         # HACK: If its an asteroid, split the overlap then move both
         if isinstance(bounce_object, Asteroid):
             overlap /= 2
@@ -106,7 +107,7 @@ class Asteroid(CircleShape):
         
     def create_local_polygon_coords(self) -> list[pygame.Vector2]:
         """Creates a list of randomly positioned coordinates for drawing a 'rocky' asteroid shape."""
-        # FUTURE: Have different no. of segments depending on size(maybe radius?)
+        #FUTURE: Have different no. of segments depending on size(maybe radius?)
         
         # Asteroid is split into 20 degree chunks
         segement_degree_step = 20
@@ -115,7 +116,7 @@ class Asteroid(CircleShape):
         min_rand_limit = 0.85
         max_rand_limit = 1.12
         
-        # FUTURE: Clean up double upper/lower range calcs here and in for loop
+        #FUTURE: Clean up double upper/lower range calcs here and in for loop
         random_factor = random.uniform(min_rand_limit, max_rand_limit)
         rand_factor_range = 0.15 # How much the different factors can deviate from each other
         upper_range = random_factor + rand_factor_range
