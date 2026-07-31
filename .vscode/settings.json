@@ -4,7 +4,13 @@
         "blit",
         "blits",
         "circleshape",
-        "COOLDOWN"
+        "collidepoint",
+        "COOLDOWN",
+        "interactor",
+        "interactors",
+        "MOUSEBUTTONDOWN",
+        "MOUSEMOTION",
+        "scenemanager"
     ],
     "todo-tree.tree.scanMode": "workspace only"
 }

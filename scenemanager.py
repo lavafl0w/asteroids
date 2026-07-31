@@ -33,15 +33,15 @@ class MainMenu:
                 
     def handle_events(self, events) -> None | MainMenuAction:
         button_return = None
-        
-        for event in events:
-            button_return = self.start_button.handle_events(event)
-            if button_return:
-               return button_return
-            
-            button_return = self.quit_button.handle_events(event)
-            if button_return:
-                return button_return
+        if not self.start_button.pending_callback or self.quit_button.pending_callback:
+            for event in events:
+                button_return = self.start_button.handle_events(event)
+                if button_return:
+                   return button_return
+
+                button_return = self.quit_button.handle_events(event)
+                if button_return:
+                    return button_return
             
     def draw(self, screen: pygame.Surface) -> None:
         screen.blit(self.menu_background, (0,0))
@@ -55,9 +55,15 @@ class MainMenu:
         self.start_button.draw(screen)
         self.quit_button.draw(screen)
     
-    def update(self, dt:float) -> None:
-        #? Idk if update() is needed here
-        pass
+    def update(self, dt:float) -> None | MainMenuAction:      
+        button_return = self.start_button.update()
+        if button_return:
+            return button_return
+        
+        button_return = self.quit_button.update()
+        if button_return:
+            return button_return
+        
     
     def start_game(self) -> Literal['game_loop']:
         setup.start_music("game_loop") # Start music for game loop
@@ -153,7 +159,6 @@ class GameLoop:
                     #FUTURE: this could be different score because it was a bomb
 
 
-#TODO: This is just temporary death pause implementation, flesh it out
 class DeathPause:
     def __init__(self, death_audio_channel: pygame.mixer.Channel) -> None:
         self.death_audio_channel = death_audio_channel
@@ -162,6 +167,7 @@ class DeathPause:
         pass
     
     def draw(self, screen:pygame.Surface) -> None:
+        #TODO: Temporary death pause screen visual, need to design
         screen.fill("red")
     
     def update(self, dt:float) -> None | Literal['quit']:
@@ -189,6 +195,7 @@ class Button(Generic[T]):
         self.audio_channel = audio_channel
         self.callback = callback
         self.hovered_over = False
+        self.pending_callback = False
         
     def handle_events(self, event: Event) -> T | None:
         old_hover_state = self.hovered_over
@@ -199,15 +206,13 @@ class Button(Generic[T]):
         elif event.type == pygame.MOUSEBUTTONDOWN and self.hovered_over:
             if self.press_audio:
                 self.audio_channel.play(self.press_audio) # Play press audio
-                
-                # Wait until done
-                while self.audio_channel.get_busy(): #HACK
-                    continue
-                
-            return self.callback()
+                self.pending_callback = True
+                return
+            
+            return self.callback() # Guard against audio not being assigned
         
-        # If button was just hovered over, play hover audio once
-        if self.hover_audio and (not old_hover_state and self.hovered_over):
+        # If button isn't pending_callback was just hovered over, play hover audio once
+        if self.hover_audio and not self.pending_callback and (not old_hover_state and self.hovered_over):
             self.audio_channel.play(self.hover_audio)
     
     def draw(self, screen:pygame.Surface) -> None:
@@ -222,6 +227,11 @@ class Button(Generic[T]):
         
         # Blit the text surface on the text rect
         screen.blit(text_surface, text_rect)
+        
+    def update(self) -> T | None:
+        if not self.audio_channel.get_busy() and self.pending_callback == True:
+            self.pending_callback = False
+            return self.callback()
 
 
 Scene = MainMenu | GameLoop | DeathPause
