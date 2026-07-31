@@ -33,15 +33,17 @@ class MainMenu:
                 
     def handle_events(self, events) -> None | MainMenuAction:
         button_return = None
-        if not self.start_button.pending_callback or self.quit_button.pending_callback:
-            for event in events:
-                button_return = self.start_button.handle_events(event)
-                if button_return:
-                   return button_return
+        if self.start_button.pending_callback or self.quit_button.pending_callback:
+            return
+        
+        for event in events:
+            button_return = self.start_button.handle_events(event)
+            if button_return:
+                return button_return
 
-                button_return = self.quit_button.handle_events(event)
-                if button_return:
-                    return button_return
+            button_return = self.quit_button.handle_events(event)
+            if button_return:
+                return button_return
             
     def draw(self, screen: pygame.Surface) -> None:
         screen.blit(self.menu_background, (0,0))

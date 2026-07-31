@@ -16,6 +16,7 @@ Right now, focus on just tracking the values like time, bullets, asteroids, item
 # But converting 'time_passed' to 'self.time_passed' automatically outside of init
 @dataclass
 class ScoreKeeperClass:
+    #NOTE: Currently has nothing in place for game_loop reset to wipe values
     time_passed: float = 0.0 # Time played
     bullets_fired:int = 0 # Total shots
     asteroids_shot:int = 0 # Total (small) asteroids destroyed by player shots

@@ -2,7 +2,7 @@ from typing import cast
 from circleshape import CircleShape, TriangleShape
 import pygame
 
-def collides(shape_1: CircleShape, shape_2: CircleShape) -> bool | None:
+def collides(shape_1: CircleShape, shape_2: CircleShape) -> bool:
     """ Master Collision Check / Router
     
     This is the collision check dispatcher to keep things simple.
@@ -33,11 +33,12 @@ def collides(shape_1: CircleShape, shape_2: CircleShape) -> bool | None:
                 )
             case _:
                 if attempt == 1: # If this is the second pass after they were flipped
-                    raise NotImplementedError(
-                        f"Collision case not found for object_1: {shape_1.__class__.__name__}" +
-                        f"and object_2: {shape_2.__class__.__name__}")
-                shape_1, shape_2 = shape_2, shape_1 # Flip them about
-                attempt += 1
+                    shape_1, shape_2 = shape_2, shape_1 # Flip them about
+                    attempt += 1
+                    
+    raise NotImplementedError(
+        f"Collision case not found for object_1: {shape_1.__class__.__name__}" +
+        f"and object_2: {shape_2.__class__.__name__}")
 
 def circle_overlaps_circle(circle_1: CircleShape, circle_2: CircleShape) -> bool:
     """ Bomb Explosion / Asteroid -- Circle / Circle """
