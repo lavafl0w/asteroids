@@ -131,7 +131,7 @@ class Player(CircleShape):
     def get_hitbox(self) -> TriangleShape:
         return self.triangle()
     
-    def asteroid_hit(self) -> None | pygame.mixer.Channel | Literal['death']:
+    def asteroid_hit(self) -> None | pygame.mixer.Channel:
         """ Player was hit by asteroid """
                
         if self.hit_cooldown <= 0:
@@ -145,8 +145,8 @@ class Player(CircleShape):
                 
             if self.player_lives <= 0: # Death
                 if self.death_audio:
-                    self.death_audio.play()
-                    return "death"
+                    death_audio_channel = self.death_audio.play()
+                    return death_audio_channel
 
             if self.player_hit_audio and self.player_lives >= 1: # Oof
                 self.player_hit_audio.play()

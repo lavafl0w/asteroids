@@ -10,7 +10,6 @@ from scorekeeper import ScoreKeeper
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 
 
-#FUTURE: Main menu music, button hover and click sound effect
 class MainMenu:
     start_hover_audio: pygame.mixer.Sound | None = None
     quit_hover_audio: pygame.mixer.Sound | None = None
@@ -31,7 +30,6 @@ class MainMenu:
                                     self.audio_channel, self.quit_game)
                 
     def handle_events(self, events) -> None | Literal['game_loop'] | Literal['quit']:
-        keys = pygame.key.get_pressed()
         button_return = None
         
         for event in events:
@@ -81,6 +79,8 @@ class GameLoop:
         
         # HUD display
         self.hud = HUD()
+        
+        self.death_audio_channel = None
     
     #FUTURE: Escape should be pause menu    
     def handle_events(self, events) -> None | Literal['main_menu']:
@@ -116,22 +116,23 @@ class GameLoop:
         
         #* Checks asteroid | asteroid collision (for bouncing)
         asteroids_group = list(self.container_groups["asteroids"])
-        for i in range(0, len(asteroids_group)):
-            asteroid_1 = asteroids_group[i]
-            for j in range(i+1, len(asteroids_group)):
+        for i in range(0, len(asteroids_group)): # Iterate through all asteroids (asteroid_1)
+            asteroid_1 = asteroids_group[i] 
+            
+            for j in range(i+1, len(asteroids_group)): # Iterate through all asteroids after asteroid_1
                 asteroid_2 = asteroids_group[j]
-                if collides(asteroid_1, asteroid_2):
+                
+                if collides(asteroid_1, asteroid_2): # Check collision
                     asteroid_1.bounce(asteroid_2)                
 
         #* Checks any other asteroid collisions
         for asteroid in self.container_groups["asteroids"]:                 
             # Player | asteroid collision
             if collides(self.player1, asteroid):
-                death_result = self.player1.asteroid_hit()
-                if death_result == "death":
-                    #? toggle music should probably be handled by death_pause?
-                    #//setup.toggle_music() # Switch music off
-                    return "death_pause"
+                death_channel = self.player1.asteroid_hit()
+                if death_channel: # Channel was returned, so must have died
+                    self.death_audio_channel = death_channel # Store it to be accessed later
+                    return 'death_pause'
 
             # Bullet/shield | asteroid collision
             for interactor in self.container_groups["asteroid_interactors"]:
@@ -152,8 +153,8 @@ class GameLoop:
 
 #TODO: This is just temporary death pause implementation, flesh it out
 class DeathPause:
-    def __init__(self) -> None:
-        pass
+    def __init__(self, death_audio_channel) -> None:
+        self.death_audio_channel = death_audio_channel
     
     def handle_events(self, events: List[Event]) -> None:
         pass
@@ -161,13 +162,13 @@ class DeathPause:
     def draw(self, screen:pygame.Surface) -> None:
         screen.fill("red")
     
-    def update(self, dt:float) -> Literal['quit']:
+    def update(self, dt:float) -> None | Literal['quit']:
         # Switch music and wait until death effect is done
-        setup.toggle_music()
-        while pygame.mixer.get_busy(): #HACK
-            continue
+        if pygame.mixer.music.get_busy():
+            setup.toggle_music()
         
-        return "quit"
+        if not self.death_audio_channel.get_busy():        
+            return "quit"
 
 
 class Button:
@@ -175,9 +176,7 @@ class Button:
                  button_text:str, base_color:str, hover_color:str, press_audio: pygame.mixer.Sound | None,
                  hover_audio: pygame.mixer.Sound | None, audio_channel: pygame.mixer.Channel, callback: Callable) -> None:
         self.button = pygame.Rect(0, 0, width, height)
-        self.width = width
-        self.height = height
-        self.centre = centre
+        self.button.center = centre
         self.font = font_obj
         self.button_text = button_text
         self.base_color = base_color
@@ -209,8 +208,7 @@ class Button:
             self.audio_channel.play(self.hover_audio)
     
     def draw(self, screen:pygame.Surface) -> None:
-        # Draw the overall/entire button rect -centred and coloured- on screen
-        self.button.center = self.centre
+        # Draw the overall/entire button rect coloured on screen
         colour = self.hover_color if self.hovered_over else self.base_color
         pygame.draw.rect(screen, colour, self.button)
         
@@ -224,10 +222,51 @@ class Button:
 
         
     
-Scenes = dict[str, MainMenu | GameLoop | DeathPause]
-def create_scenes() -> Scenes:
-    return {
-        "main_menu": MainMenu(),
-        "game_loop": GameLoop(),
-        "death_pause": DeathPause(),
-    }
+Scene = MainMenu | GameLoop | DeathPause
+SceneStore = dict[str, Scene]
+
+def create_scene_store() -> Callable[..., SceneStore]:
+    # This dictionary lives inside the closure, so it persists between calls to
+    # prepare_scene() without needing to be global.
+    active_scenes = {}
+    
+    def prepare_scene(scene_name: str, death_channel: pygame.mixer.Channel | None = None) -> SceneStore:
+        """ This function is returned to main.py as `scene_store`.
+        main.py asks for a scene by name, and this function makes sure the
+        correct scene object exists in active_scenes before returning the dict."""
+        nonlocal active_scenes
+        
+        # If the request was to restart the game loop fresh
+        if scene_name == "game_loop_restart":
+            
+            # Rename to game_loop so the rest can be handled by scene creation code below
+            scene_name = "game_loop" 
+            
+            if active_scenes.get(scene_name) is None: # Guard against possible error
+                raise Exception("somehow trying to restart game loop without it existing")
+            
+            del active_scenes[scene_name] # Delete current game loop
+        
+        # If the scene already exists, skip the scene creation
+        if active_scenes.get(scene_name) is not None:
+            return active_scenes
+        
+        # Creates a scene based on what was passed into scene_name
+        if scene_name == "main_menu":
+            active_scenes[scene_name] = MainMenu()        
+        elif scene_name == "game_loop":
+            active_scenes[scene_name] = GameLoop()   
+        elif scene_name == "death_pause":               
+            active_scenes[scene_name] = DeathPause(death_channel)
+            
+        return active_scenes
+    
+    return prepare_scene
+            
+    
+    
+    #return {
+    #    "main_menu": MainMenu(),
+    #    "game_loop": GameLoop(),
+    #    "death_pause": DeathPause(),
+    #}

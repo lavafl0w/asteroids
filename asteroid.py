@@ -82,14 +82,15 @@ class Asteroid(CircleShape):
         # Gets the distance and gets the overlap amount
         centre_distance = self.position.distance_to(bounce_object.position)
         overlap = (bounce_object.radius + self.radius) - centre_distance
-
-        if overlap > self.radius*2: #!
-            print(
-                    "asteroid overlap -> "
-                    f"center={self.position}, radius={self.radius}, "
-                    f"overlap={overlap}, distance={centre_distance}, "
-                    f"other center={bounce_object.position}, other radius={bounce_object.radius}"
-                )
+        
+        if debug_flags.check("DEBUG_ASTEROID_OVERLAP_CHECK"):#!
+            if overlap > self.radius*2: 
+                print(
+                        "asteroid overlap -> "
+                        f"center={self.position}, radius={self.radius}, "
+                        f"overlap={overlap}, distance={centre_distance}, "
+                        f"other center={bounce_object.position}, other radius={bounce_object.radius}"
+                    )
         
         # Guard against zero-length vectors before normalizing.
         if push_direction_vector.length() == 0:
