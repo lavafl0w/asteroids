@@ -1,4 +1,4 @@
-from typing import Callable, List, Literal, NoReturn
+from typing import Callable, Generic, List, Literal, TypeVar
 import pygame
 from pygame.event import Event
 import setup
@@ -9,6 +9,8 @@ from collisions import collides
 from scorekeeper import ScoreKeeper
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 
+MainMenuAction = Literal['game_loop', 'quit']
+T = TypeVar("T")
 
 class MainMenu:
     start_hover_audio: pygame.mixer.Sound | None = None
@@ -29,7 +31,7 @@ class MainMenu:
                                     "Quit", "red", "green", self.quit_press_audio, self.quit_hover_audio, 
                                     self.audio_channel, self.quit_game)
                 
-    def handle_events(self, events) -> None | Literal['game_loop'] | Literal['quit']:
+    def handle_events(self, events) -> None | MainMenuAction:
         button_return = None
         
         for event in events:
@@ -80,7 +82,7 @@ class GameLoop:
         # HUD display
         self.hud = HUD()
         
-        self.death_audio_channel = None
+        self.death_audio_channel: pygame.mixer.Channel | None = None
     
     #FUTURE: Escape should be pause menu    
     def handle_events(self, events) -> None | Literal['main_menu']:
@@ -153,7 +155,7 @@ class GameLoop:
 
 #TODO: This is just temporary death pause implementation, flesh it out
 class DeathPause:
-    def __init__(self, death_audio_channel) -> None:
+    def __init__(self, death_audio_channel: pygame.mixer.Channel) -> None:
         self.death_audio_channel = death_audio_channel
     
     def handle_events(self, events: List[Event]) -> None:
@@ -169,12 +171,13 @@ class DeathPause:
         
         if not self.death_audio_channel.get_busy():        
             return "quit"
+        
 
-
-class Button:
+class Button(Generic[T]):
     def __init__(self, width:int, height: int, centre:tuple, font_obj:pygame.font.Font,
                  button_text:str, base_color:str, hover_color:str, press_audio: pygame.mixer.Sound | None,
-                 hover_audio: pygame.mixer.Sound | None, audio_channel: pygame.mixer.Channel, callback: Callable) -> None:
+                 hover_audio: pygame.mixer.Sound | None, audio_channel: pygame.mixer.Channel,
+                 callback: Callable[[], T]) -> None:
         self.button = pygame.Rect(0, 0, width, height)
         self.button.center = centre
         self.font = font_obj
@@ -187,7 +190,7 @@ class Button:
         self.callback = callback
         self.hovered_over = False
         
-    def handle_events(self, event: Event) -> None:
+    def handle_events(self, event: Event) -> T | None:
         old_hover_state = self.hovered_over
         
         if event.type == pygame.MOUSEMOTION:
@@ -220,15 +223,14 @@ class Button:
         # Blit the text surface on the text rect
         screen.blit(text_surface, text_rect)
 
-        
-    
+
 Scene = MainMenu | GameLoop | DeathPause
 SceneStore = dict[str, Scene]
 
 def create_scene_store() -> Callable[..., SceneStore]:
     # This dictionary lives inside the closure, so it persists between calls to
     # prepare_scene() without needing to be global.
-    active_scenes = {}
+    active_scenes: SceneStore = {}
     
     def prepare_scene(scene_name: str, death_channel: pygame.mixer.Channel | None = None) -> SceneStore:
         """ This function is returned to main.py as `scene_store`.
@@ -256,17 +258,12 @@ def create_scene_store() -> Callable[..., SceneStore]:
             active_scenes[scene_name] = MainMenu()        
         elif scene_name == "game_loop":
             active_scenes[scene_name] = GameLoop()   
-        elif scene_name == "death_pause":               
+        elif scene_name == "death_pause":
+            if death_channel is None:
+                raise ValueError("death_pause needs the player death audio channel")
             active_scenes[scene_name] = DeathPause(death_channel)
             
         return active_scenes
     
     return prepare_scene
-            
-    
-    
-    #return {
-    #    "main_menu": MainMenu(),
-    #    "game_loop": GameLoop(),
-    #    "death_pause": DeathPause(),
-    #}
+

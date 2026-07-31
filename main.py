@@ -28,7 +28,7 @@ def main() -> None:
     # 'active_scenes_dict' is what holds the returned dict from scene_store
     # this is needed due to scene_store being a function
     active_scenes_dict = scene_store(current_scene_name)
-    next_requested_scene_name = None # So both handle_events and update can request a scene change
+    next_requested_scene_name = None
     
     setup.start_music("main_menu")
     
