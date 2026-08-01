@@ -1,7 +1,7 @@
 import pygame
 from core.audio_manager import audio
 from score_keeper import ScoreKeeper
-from base import BaseItemPowerup
+from powerups.base import BaseItemPowerup
 from constants import (BOMB_DETONATE_COUNTDOWN_TIME, ITEM_WIDTH, 
                        ITEM_HEIGHT, MAX_BOMB_EXPLOSION_TIME, LINE_WIDTH,
                        BOMB_EXPLOSION_RADIUS_EXPANSION)

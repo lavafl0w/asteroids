@@ -1,7 +1,7 @@
 import random
 from constants import (HEALTH_SPAWN_CHANCE, SHIELD_SPAWN_CHANCE, BOMB_SPAWN_CHANCE)
-from bomb import Bomb
-from pickups import ShieldPowerupItem, HealthPickup
+from powerups.bomb import Bomb
+from powerups.pickups import ShieldPowerupItem, HealthPickup
 
 def check_powerup_drop(asteroid_position) -> None:
     '''

@@ -1,5 +1,5 @@
 import pygame
-from base import BaseItemPowerup
+from powerups.base import BaseItemPowerup
 from player import Player
 from constants import SHIELD_ITEM_PICKUP_RADIUS, HEALTH_PICKUP_RADIUS
 
