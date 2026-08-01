@@ -2,28 +2,24 @@ import pygame
 from constants import SCREEN_WIDTH
 from ui.button import Button
 from typing import Literal
-import setup
+from core.audio_manager import audio
 
 MainMenuAction = Literal['game_loop', 'quit']
 
 class MainMenu:
-    start_hover_audio: pygame.mixer.Sound | None = None
-    quit_hover_audio: pygame.mixer.Sound | None = None
-    start_press_audio: pygame.mixer.Sound | None = None
-    quit_press_audio: pygame.mixer.Sound | None = None
-    
     def __init__(self) -> None:
         self.title_font = pygame.font.Font(None, 64)
         self.button_font = pygame.font.Font(None, 32)
         self.menu_background = pygame.image.load("assets/amazing_menu_background.png")
-        self.audio_channel = pygame.mixer.find_channel(True) # Force a channel in case none are available
+        
+        self.audio_channel: pygame.mixer.Channel | None = None
         
         self.start_button = Button(150, 75, (SCREEN_WIDTH/2, 350), self.button_font, 
-                                    "Start Game", "red", "green", self.start_press_audio, self.start_hover_audio,
-                                    self.audio_channel, self.start_game)
+                                    "Start Game", "red", "green", audio.menu_start_press_audio, audio.menu_start_hover_audio,
+                                    self.start_game)
         self.quit_button = Button(150, 75, (SCREEN_WIDTH/2, 650), self.button_font, 
-                                    "Quit", "red", "green", self.quit_press_audio, self.quit_hover_audio, 
-                                    self.audio_channel, self.quit_game)
+                                    "Quit", "red", "green", audio.menu_quit_press_audio, audio.menu_quit_hover_audio,
+                                    self.quit_game)
                 
     def handle_events(self, events) -> None | MainMenuAction:
         button_return = None
@@ -62,7 +58,7 @@ class MainMenu:
         
     
     def start_game(self) -> Literal['game_loop']:
-        setup.start_music("game_loop") # Start music for game loop
+        audio.start_music("game_loop") # Start music for game loop
         return "game_loop"
     
     def quit_game(self) -> Literal['quit']:

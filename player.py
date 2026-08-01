@@ -1,5 +1,4 @@
 from circle_shape import CircleShape, TriangleShape
-from typing import Literal
 from constants import (
     LINE_WIDTH,
     PLAYER_RADIUS,
@@ -19,15 +18,9 @@ from constants import (
 from shot import Shot
 import pygame
 from score_keeper import ScoreKeeper
+from core.audio_manager import audio
 
 class Player(CircleShape):    
-    # All sounds get assigned after import
-    death_audio: pygame.mixer.Sound | None = None
-    shot_audio: pygame.mixer.Sound | None = None
-    player_hit_audio: pygame.mixer.Sound | None = None
-    player_low_health_audio: pygame.mixer.Sound | None = None
-    player_life_pickup_audio: pygame.mixer.Sound | None = None
-    player_life_maximum_audio: pygame.mixer.Sound | None = None
     
     def __init__(self, x: float, y:float) -> None:
         super().__init__(x, y, PLAYER_RADIUS)
@@ -96,8 +89,11 @@ class Player(CircleShape):
         
         # If a shield has been assigned    
         if self.active_shield is not None:
-            self.active_shield.position = self.position # Update the position to player position
-            if not self.active_shield.activated: # If shield has been removed
+            # Update the position to player position
+            self.active_shield.position = self.position
+            
+            # If shield has been removed
+            if not self.active_shield.activated: 
                 self.active_shield = None # Remove link to player
         
     # Move back and forward
@@ -121,8 +117,7 @@ class Player(CircleShape):
             # Creates, rotates and increases speed of newly created shot
             bullet.velocity = pygame.math.Vector2(0,1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
             
-            if self.shot_audio: # Pew pew pew
-                self.shot_audio.play()
+            audio.play_effect(audio.player_shot_audio) # Pew pew pew
             
             self.shot_cooldown = PLAYER_SHOT_COOLDOWN_SECONDS # Set shot cooldown to max
             
@@ -139,41 +134,37 @@ class Player(CircleShape):
             self.player_lives -= 1
             self.hit_cooldown = PLAYER_HIT_COOLDOWN
             
+            if self.player_lives >= 1: # Oof
+                audio.play_effect(audio.player_hit_audio)
+            
             if self.player_lives == 1: # Low health
-                if self.player_low_health_audio:
-                    self.player_low_health_audio.play()
+                audio.play_effect(audio.player_low_health_audio)
                 
             if self.player_lives <= 0: # Death
-                if self.death_audio:
-                    death_audio_channel = self.death_audio.play()
+                    death_audio_channel = audio.play_effect(audio.player_death_audio)
                     return death_audio_channel
-
-            if self.player_hit_audio and self.player_lives >= 1: # Oof
-                self.player_hit_audio.play()
 
     def player_effect_add(self, effect: str) -> None:
         """ Add an effect to the player """
+        
         # Add a shield if there is none
         if effect == "shield":
             if self.active_shield is None:
                 self.active_shield = ShieldPowerup(self.position.x, self.position.y)
             else: # We already have a shield so refresh the values
                 self.active_shield.refresh()
+        
+        # Add health        
         if effect == "health":
             if self.player_lives <= 4:  # Add lives up to max of 5
                 self.player_lives += 1
-                if self.player_life_pickup_audio:
-                    self.player_life_pickup_audio.play() # Play life pickup audio
+                audio.play_effect(audio.player_life_pickup_audio) # Play life pickup audio
                 return
-            if self.player_life_maximum_audio:
-                self.player_life_maximum_audio.play() # Play max health audio instead
+            
+            audio.play_effect(audio.player_life_maximum_audio) # Play max health audio instead
 
             
 class ShieldPowerup(CircleShape):
-    shield_activate_effect: pygame.mixer.Sound | None = None
-    shield_deactivate_effect: pygame.mixer.Sound | None = None
-    shield_hit_effect: pygame.mixer.Sound | None = None
-    shield_break_effect: pygame.mixer.Sound | None = None
     
     def __init__(self, x, y) -> None:
         super().__init__(x, y, radius = SHIELD_RADIUS)
@@ -183,8 +174,7 @@ class ShieldPowerup(CircleShape):
         self.shield_hit_cooldown = 0
         self.color = "orange"
         
-        if self.shield_activate_effect is not None:
-            self.shield_activate_effect.play()
+        audio.play_effect(audio.shield_activate_effect) # Shield was created/activated
         
     def draw(self, screen: pygame.Surface) -> None:
         pygame.draw.circle(screen, self.color, self.position, self.radius, LINE_WIDTH)
@@ -197,9 +187,8 @@ class ShieldPowerup(CircleShape):
         # If no more time available with the shield
         if self.shield_time_remaining <= 0:
             self.shield_deactivate()
-            if self.shield_deactivate_effect is not None:
-                self.shield_deactivate_effect.play()
-            
+            audio.play_effect(audio.shield_deactivate_effect) # Deactivate audio
+
         if self.shield_hit_cooldown > 0:
             self.color = "red"
         else:
@@ -224,18 +213,16 @@ class ShieldPowerup(CircleShape):
             # If that was the final hit
             if self.shield_hits_remaining == 0:
                 self.shield_deactivate() # Deactivate it
-                if self.shield_break_effect is not None:
-                    self.shield_break_effect.play() # Play break sound
-                    
+                audio.play_effect(audio.shield_break_effect) # Break audio                    
                 return True
             
             # It wasn't the final hit, so play hit sound
-            if self.shield_hit_effect is not None:
-                self.shield_hit_effect.play()
+            audio.play_effect(audio.shield_hit_effect)
                 
             # Set cooldown    
             self.shield_hit_cooldown = SHIELD_HIT_COOLDOWN    
             return True
         
-        # Return false for no shield damage so main can call asteroid.bounce() instead
+        # Return false for no shield damage (eg on cooldown) 
+        # so main can call asteroid.bounce() instead
         return False

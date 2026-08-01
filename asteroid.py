@@ -1,4 +1,5 @@
 from circle_shape import CircleShape
+from core.audio_manager import audio
 from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH, SCREEN_WIDTH, SCREEN_HEIGHT
 from powerups import check_powerup_drop
 from score_keeper import ScoreKeeper
@@ -8,7 +9,6 @@ import random
 
 #! Currently only uses circle collision logic instead of actual shape collision
 class Asteroid(CircleShape):
-    asteroid_split_sound: pygame.mixer.Sound | None = None  # Asteroid split sound gets assigned after importing
     
     def __init__(self, x: float, y: float, radius: float) -> None:
         super().__init__(x, y, radius)
@@ -16,13 +16,13 @@ class Asteroid(CircleShape):
         self.color = "white"
 
     def draw(self, screen: pygame.Surface) -> None:
-        if debug_flags.check("DEBUG_ASTEROID_POLYGON_OUTLIERS"): #!
+        if debug_flags.check("DEBUG_ASTEROID_POLYGON_OUTLIERS"): #! DEBUG
             self.debug_polygon_outliers()
 
         world_point_coords = [self.position + point for point in self.local_point_coords]
         pygame.draw.polygon(screen, self.color, world_point_coords, LINE_WIDTH)
 
-    def debug_polygon_outliers(self) -> None: #!
+    def debug_polygon_outliers(self) -> None: #! DEBUG
         """Print if a local polygon point is suspiciously far from this asteroid."""
         max_expected_distance = self.radius * 2
 
@@ -52,9 +52,8 @@ class Asteroid(CircleShape):
         """Handles splitting of asteroids into smaller/faster ones when hit"""
         self.kill() # Regardless of size, destroy it
         
-        if Asteroid.asteroid_split_sound is not None:
-            Asteroid.asteroid_split_sound.play()
-        
+        audio.play_effect(audio.asteroid_split_sound) # Split audio
+
         # This was a small asteroid
         if self.radius <= ASTEROID_MIN_RADIUS:
             ScoreKeeper.asteroid_was_shot()
@@ -83,7 +82,7 @@ class Asteroid(CircleShape):
         centre_distance = self.position.distance_to(bounce_object.position)
         overlap = (bounce_object.radius + self.radius) - centre_distance
         
-        if debug_flags.check("DEBUG_ASTEROID_OVERLAP_CHECK"):#!
+        if debug_flags.check("DEBUG_ASTEROID_OVERLAP_CHECK"):#! DEBUG
             if overlap > self.radius*2: 
                 print(
                         "asteroid overlap -> "

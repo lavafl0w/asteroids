@@ -1,6 +1,7 @@
 # INTERNAL COMPONENT IMPORTS
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
-import setup
+import core.setup as setup
+from core.audio_manager import audio
 # SYSTEM IMPORTS
 import pygame
 import scene_manager
@@ -12,9 +13,6 @@ def main() -> None:
 
     # Start pygame internals and get back the screen and the clock to use
     screen, pygame_clock = setup.setup_pygame()
-    
-    # Get audio set up, play music and assign effects
-    setup.setup_sound_effects()
 
     # `scene_store` is a closure returned by create_scene_store().
     # It remembers the active scene objects and creates/reuses them when asked.
@@ -30,7 +28,7 @@ def main() -> None:
     active_scenes_dict = scene_store(current_scene_name)
     next_requested_scene_name = None
     
-    setup.start_music("main_menu")
+    audio.start_music("main_menu")
     
     #* Game Loop #
     while True:    

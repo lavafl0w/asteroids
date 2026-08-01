@@ -1,5 +1,6 @@
 import pygame
 import random
+from core.audio_manager import audio
 from circle_shape import CircleShape
 from constants import (
     ITEM_WIDTH, ITEM_HEIGHT, LINE_WIDTH,
@@ -68,9 +69,6 @@ class BaseItemPowerup(CircleShape):
         return self
 
 class Bomb(BaseItemPowerup):
-    # Assigned sound effected after mixer init
-    explosion_sound: pygame.mixer.Sound | None = None
-    countdown_sound: pygame.mixer.Sound | None = None
     width = ITEM_WIDTH
     height = ITEM_HEIGHT
     hitbox_kind = "rect"
@@ -95,8 +93,7 @@ class Bomb(BaseItemPowerup):
             ScoreKeeper.bomb_was_activated()
             self.color = "red"
             self.time_until_despawn = self.time_before_detonation # This is so the bomb flashes faster on trigger
-            if Bomb.countdown_sound is not None: # Play the first beep as it doesn't look right without it
-                Bomb.countdown_sound.play()
+            audio.play_effect(audio.bomb_countdown_sound) # Play the first beep as it doesn't look right without it
 
     def update(self, dt: float) -> None:
         # Item hasn't been activated yet
@@ -109,9 +106,10 @@ class Bomb(BaseItemPowerup):
             if self.time_before_detonation > 0:
                 old_visible_state = self.is_visible
                 self.update_warning_blink(dt)
-                # If the bomb sound exists, and the bomb has flashed off -> on this frame
-                if Bomb.countdown_sound is not None and (not old_visible_state and self.is_visible):
-                    Bomb.countdown_sound.play()
+                
+                # If the bomb has flashed off -> on this frame
+                if (not old_visible_state and self.is_visible):
+                    audio.play_effect(audio.bomb_countdown_sound) # Beep
                
                 self.time_before_detonation -= dt
                 return
@@ -121,8 +119,7 @@ class Bomb(BaseItemPowerup):
     
     # How to boom        
     def detonate(self) -> None:
-        if Bomb.explosion_sound is not None: # If the sound has been attached
-            Bomb.explosion_sound.play() # Make important boom noise
+        audio.play_effect(audio.bomb_explosion_sound) # Make important boom noise
         self.kill() # Remove bomb cause it went boom
         BombExplosion(self.position.x, self.position.y, 1) # Start bomb explosion from where bomb was, radius 1
         

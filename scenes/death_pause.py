@@ -1,5 +1,5 @@
 import pygame
-import setup
+from core.audio_manager import audio
 from typing import Literal, List
 from pygame.event import Event
 
@@ -17,7 +17,7 @@ class DeathPause:
     def update(self, dt:float) -> None | Literal['quit']:
         # Switch music and wait until death effect is done
         if pygame.mixer.music.get_busy():
-            setup.toggle_music()
+            audio.toggle_music()
         
         if not self.death_audio_channel.get_busy():        
             return "quit"

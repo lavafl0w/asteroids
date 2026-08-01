@@ -1,5 +1,5 @@
 import pygame
-import setup
+import core.setup as setup
 from typing import Literal
 from player import Player
 from asteroid_field import AsteroidField
