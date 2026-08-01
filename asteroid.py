@@ -1,7 +1,7 @@
 from circle_shape import CircleShape
 from core.audio_manager import audio
 from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH, SCREEN_WIDTH, SCREEN_HEIGHT
-from powerups import check_powerup_drop
+from powerups.drops import check_powerup_drop
 from score_keeper import ScoreKeeper
 import tools.debug_flags as debug_flags
 import pygame

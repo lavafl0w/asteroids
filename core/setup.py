@@ -1,5 +1,10 @@
 import pygame
-import player, powerups, asteroid, asteroid_field, shot
+from player import Player, ShieldPowerup
+from asteroid_field import AsteroidField
+from shot import Shot
+from asteroid import Asteroid
+from powerups.bomb import Bomb, BombExplosion
+from powerups.pickups import ShieldPowerupItem, HealthPickup
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from core.audio_manager import audio
 
@@ -37,14 +42,14 @@ def setup_assign_groups() -> dict[str, pygame.sprite.Group]:
 
 def assign_containers(g) -> None:
     """Assigns all the sprite containers to relevant groups to then be more easily used"""    
-    asteroid_field.AsteroidField.containers = (g["updatable"])
-    asteroid.Asteroid.containers = (g["updatable"], g["drawable"], g["asteroids"])
+    AsteroidField.containers = (g["updatable"])
+    Asteroid.containers = (g["updatable"], g["drawable"], g["asteroids"])
     
-    player.Player.containers = (g["updatable"], g["drawable"])
-    player.ShieldPowerup.containers = (g["updatable"], g["drawable"], g["asteroid_interactors"])
-    shot.Shot.containers = (g["updatable"], g["drawable"], g["asteroid_interactors"])
+    Player.containers = (g["updatable"], g["drawable"])
+    ShieldPowerup.containers = (g["updatable"], g["drawable"], g["asteroid_interactors"])
+    Shot.containers = (g["updatable"], g["drawable"], g["asteroid_interactors"])
     
-    powerups.Bomb.containers = (g["updatable"], g["drawable"], g["powerup_items"])
-    powerups.BombExplosion.containers = (g["updatable"], g["drawable"], g["explosion_radii"])
-    powerups.ShieldPowerupItem.containers = (g["updatable"], g["drawable"], g["powerup_items"])
-    powerups.HealthPickup.containers = (g["updatable"], g["drawable"], g["powerup_items"])
+    Bomb.containers = (g["updatable"], g["drawable"], g["powerup_items"])
+    BombExplosion.containers = (g["updatable"], g["drawable"], g["explosion_radii"])
+    ShieldPowerupItem.containers = (g["updatable"], g["drawable"], g["powerup_items"])
+    HealthPickup.containers = (g["updatable"], g["drawable"], g["powerup_items"])
