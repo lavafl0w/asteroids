@@ -1,4 +1,4 @@
-from circleshape import CircleShape, TriangleShape
+from circle_shape import CircleShape, TriangleShape
 from typing import Literal
 from constants import (
     LINE_WIDTH,
@@ -18,7 +18,7 @@ from constants import (
 )
 from shot import Shot
 import pygame
-from scorekeeper import ScoreKeeper
+from score_keeper import ScoreKeeper
 
 class Player(CircleShape):    
     # All sounds get assigned after import

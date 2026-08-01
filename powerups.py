@@ -1,6 +1,6 @@
 import pygame
 import random
-from circleshape import CircleShape
+from circle_shape import CircleShape
 from constants import (
     ITEM_WIDTH, ITEM_HEIGHT, LINE_WIDTH,
     TIME_LEFT_BEFORE_ITEM_DESPAWN,
@@ -9,7 +9,7 @@ from constants import (
     HEALTH_PICKUP_RADIUS,
     BOMB_SPAWN_CHANCE, SHIELD_SPAWN_CHANCE, HEALTH_SPAWN_CHANCE
 )
-from scorekeeper import ScoreKeeper
+from score_keeper import ScoreKeeper
 from player import Player
 
 # PARENT ITEM CLASS #

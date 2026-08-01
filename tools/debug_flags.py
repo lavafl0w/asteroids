@@ -16,7 +16,7 @@ debug_dict = {
 try:
     # Try to import a local override module.
     # If the file exists, its values can replace the defaults above.
-    import debug_flags_local as _local_debug_flags
+    import tools.debug_flags_local as _local_debug_flags
 except ImportError:
     # No local file is totally fine. We just keep the defaults from this file.
     _local_debug_flags = None

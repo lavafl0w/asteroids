@@ -1,8 +1,8 @@
-from circleshape import CircleShape
+from circle_shape import CircleShape
 from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH, SCREEN_WIDTH, SCREEN_HEIGHT
 from powerups import check_powerup_drop
-from scorekeeper import ScoreKeeper
-import debug_flags
+from score_keeper import ScoreKeeper
+import tools.debug_flags as debug_flags
 import pygame
 import random
 

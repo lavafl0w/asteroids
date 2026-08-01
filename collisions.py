@@ -1,5 +1,5 @@
 from typing import cast
-from circleshape import CircleShape, TriangleShape
+from circle_shape import CircleShape, TriangleShape
 import pygame
 
 def collides(shape_1: CircleShape, shape_2: CircleShape) -> bool:

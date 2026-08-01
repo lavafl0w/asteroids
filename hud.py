@@ -1,5 +1,5 @@
 import pygame
-from scorekeeper import ScoreKeeper
+from score_keeper import ScoreKeeper
 
 class HUD:
     def __init__(self) -> None:

@@ -1,5 +1,5 @@
 import pygame
-import player, powerups, asteroid, asteroidfield, shot, scenemanager
+import player, powerups, asteroid, asteroid_field, shot, scene_manager
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 
 def setup_pygame() -> tuple[pygame.Surface, pygame.time.Clock]:
@@ -40,10 +40,10 @@ def setup_sound_effects() -> None:
     sound_effect = pygame.mixer.Sound
     
     # Scenemanager sound effects
-    scenemanager.MainMenu.start_hover_audio = sound_effect("assets/route_jingle.mp3")
-    scenemanager.MainMenu.quit_hover_audio = sound_effect("assets/bruh.mp3")
-    scenemanager.MainMenu.start_press_audio = sound_effect("assets/good_boy.mp3")
-    scenemanager.MainMenu.quit_press_audio = sound_effect("assets/vine_boom.mp3")
+    scene_manager.MainMenu.start_hover_audio = sound_effect("assets/route_jingle.mp3")
+    scene_manager.MainMenu.quit_hover_audio = sound_effect("assets/bruh.mp3")
+    scene_manager.MainMenu.start_press_audio = sound_effect("assets/good_boy.mp3")
+    scene_manager.MainMenu.quit_press_audio = sound_effect("assets/vine_boom.mp3")
     # Player sound effects
     player.Player.death_audio = sound_effect("assets/emotional_damage.mp3")
     player.Player.shot_audio = sound_effect("assets/pew_pew.mp3")
@@ -79,7 +79,7 @@ def setup_assign_groups() -> dict[str, pygame.sprite.Group]:
 
 def assign_containers(g) -> None:
     """Assigns all the sprite containers to relevant groups to then be more easily used"""    
-    asteroidfield.AsteroidField.containers = (g["updatable"])
+    asteroid_field.AsteroidField.containers = (g["updatable"])
     asteroid.Asteroid.containers = (g["updatable"], g["drawable"], g["asteroids"])
     
     player.Player.containers = (g["updatable"], g["drawable"])

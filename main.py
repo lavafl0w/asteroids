@@ -3,7 +3,7 @@ from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 import setup
 # SYSTEM IMPORTS
 import pygame
-import scenemanager
+import scene_manager
 
 def main() -> None:
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
@@ -18,7 +18,7 @@ def main() -> None:
 
     # `scene_store` is a closure returned by create_scene_store().
     # It remembers the active scene objects and creates/reuses them when asked.
-    scene_store = scenemanager.create_scene_store()
+    scene_store = scene_manager.create_scene_store()
     
     # Delta time - track change in time between loops
     dt = 0.0
@@ -74,7 +74,7 @@ def main() -> None:
             # If the next scene is going to be 'death_pause'
             if next_requested_scene_name == "death_pause":
                 # Check it didn't come from anywhere except GameLoop (to quiet the linter)
-                if not isinstance(current_scene, scenemanager.GameLoop):
+                if not isinstance(current_scene, scene_manager.GameLoop):
                     raise TypeError("death_pause can only be requested from GameLoop")
                 
                 # Get the death channel that was stored for death audio
