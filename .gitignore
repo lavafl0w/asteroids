@@ -14,6 +14,6 @@ debug_flags_local.py
 assets/unused
 unused/*
 
-# Remove .md notes, keeping readme.me
+# Remove .md notes, keeping readme.md
 *.md
 !README.md

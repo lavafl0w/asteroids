@@ -1,21 +1,13 @@
 from dataclasses import dataclass
 
-'''
-This is the scorekeeping module. It keeps score of things (in both senses). It should keep track of things like:
-
-Time played, asteroids destroyed (start with smallest first at least), total bullets fired, asteroids DECIMATED (where the bomb explosion has destroyed it), bombs activated/used, items picked up
-
-There is also an actual score associated with some of these triggers, which on death returns the total score.
-
-Some sort of respawn mechanic might be that on death, you can use a certain amount of your score to 'pay' for respawn. This value then increases depending on either the overall time played or number of times respawned. There would be a returned final score and a overall total score before being 'spent' to respawn.
-
-Right now, focus on just tracking the values like time, bullets, asteroids, items
-'''
 # Made it a dataclass cause why not
 # This sort just handles basically the __init__ part, automatically assigning the values like normal
 # But converting 'time_passed' to 'self.time_passed' automatically outside of init
 @dataclass
 class ScoreKeeperClass:
+    """This is the score keeping module. It keeps score (in both senses) of various stats, 
+    and also the total score. This isn't fully fleshed out yet."""
+    
     #NOTE: Currently has nothing in place for game_loop reset to wipe values
     time_passed: float = 0.0 # Time played
     bullets_fired:int = 0 # Total shots

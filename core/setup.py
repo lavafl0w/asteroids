@@ -8,6 +8,7 @@ def setup_pygame() -> tuple[pygame.Surface, pygame.time.Clock]:
     pygame.init()
     pygame.mixer.init()
     
+    # Assign sound effects
     audio.setup_sound_effects()
 
     # Creates an internal clock

@@ -11,7 +11,7 @@ from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 class GameLoop:
     def __init__(self) -> None:
         # Load background image
-        self.background = pygame.image.load("assets/space_background.png")
+        self.background = pygame.image.load("assets/images/space_background.png")
     
         # Get the groups and sprites all ready to go
         self.container_groups = setup.setup_assign_groups()

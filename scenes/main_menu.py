@@ -10,7 +10,7 @@ class MainMenu:
     def __init__(self) -> None:
         self.title_font = pygame.font.Font(None, 64)
         self.button_font = pygame.font.Font(None, 32)
-        self.menu_background = pygame.image.load("assets/amazing_menu_background.png")
+        self.menu_background = pygame.image.load("assets/images/amazing_menu_background.png")
         
         self.audio_channel: pygame.mixer.Channel | None = None
         
