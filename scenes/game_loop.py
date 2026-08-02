@@ -7,6 +7,7 @@ from hud import HUD
 from collisions import collides
 from score_keeper import ScoreKeeper
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from core.audio_manager import audio
 
 class GameLoop:
     def __init__(self) -> None:
@@ -23,6 +24,7 @@ class GameLoop:
         # HUD display
         self.hud = HUD()
         
+        audio.start_music("game_loop")
         self.death_audio_channel: pygame.mixer.Channel | None = None
     
     #FUTURE: Escape should be pause menu    
@@ -41,7 +43,7 @@ class GameLoop:
         # Apply the hud surface to the display over drawn sprites
         screen.blit(self.hud.hud_surface, (10,10))
     
-    def update(self, dt:float) -> None | Literal['death_pause']:
+    def update(self, dt:float) -> None | Literal['death_transition']:
         # Increase game time
         ScoreKeeper.tick_time(dt)
         
@@ -75,7 +77,7 @@ class GameLoop:
                 death_channel = self.player1.asteroid_hit()
                 if death_channel: # Channel was returned, so must have died
                     self.death_audio_channel = death_channel # Store it to be accessed later
-                    return 'death_pause'
+                    return 'death_transition'
 
             # Bullet/shield | asteroid collision
             for interactor in self.container_groups["asteroid_interactors"]:

@@ -2,9 +2,9 @@ import pygame
 from typing import Callable
 from scenes.main_menu import MainMenu
 from scenes.game_loop import GameLoop
-from scenes.death_pause import DeathPause
+from scenes.death_transition import DeathTransition, DamageReport
 
-Scene = MainMenu | GameLoop | DeathPause
+Scene = MainMenu | GameLoop | DeathTransition | DamageReport
 SceneStore = dict[str, Scene]
 
 def create_scene_store() -> Callable[..., SceneStore]:
@@ -12,7 +12,7 @@ def create_scene_store() -> Callable[..., SceneStore]:
     # prepare_scene() without needing to be global.
     active_scenes: SceneStore = {}
     
-    def prepare_scene(scene_name: str, death_channel: pygame.mixer.Channel | None = None) -> SceneStore:
+    def prepare_scene(scene_name: str, screen: pygame.Surface | None = None, death_channel: pygame.mixer.Channel | None = None) -> SceneStore:
         """ This function is returned to main.py as `scene_store`.
         main.py asks for a scene by name, and this function makes sure the
         correct scene object exists in active_scenes before returning the dict."""
@@ -28,7 +28,9 @@ def create_scene_store() -> Callable[..., SceneStore]:
                 raise Exception("somehow trying to restart game loop without it existing")
             
             del active_scenes[scene_name] # Delete current game loop
-        
+            del active_scenes["death_transition"]
+            del active_scenes["damage_report"]
+            
         # If the scene already exists, skip the scene creation
         if active_scenes.get(scene_name) is not None:
             return active_scenes
@@ -37,12 +39,12 @@ def create_scene_store() -> Callable[..., SceneStore]:
         if scene_name == "main_menu":
             active_scenes[scene_name] = MainMenu()        
         elif scene_name == "game_loop":
-            active_scenes[scene_name] = GameLoop()   
-        elif scene_name == "death_pause":
-            if death_channel is None:
-                raise ValueError("death_pause needs the player death audio channel")
-            active_scenes[scene_name] = DeathPause(death_channel)
-            
+            active_scenes[scene_name] = GameLoop()
+        elif scene_name == "death_transition":
+            if screen is not None and death_channel is not None:
+                active_scenes[scene_name] = DeathTransition(screen, death_channel)
+        elif scene_name == "damage_report":
+            active_scenes[scene_name] = DamageReport()
         return active_scenes
     
     return prepare_scene

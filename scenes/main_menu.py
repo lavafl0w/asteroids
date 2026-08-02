@@ -13,6 +13,7 @@ class MainMenu:
         self.menu_background = pygame.image.load("assets/images/amazing_menu_background.png")
         
         self.audio_channel: pygame.mixer.Channel | None = None
+        audio.start_music('main_menu')
         
         self.start_button = Button(150, 75, (SCREEN_WIDTH/2, 350), self.button_font, 
                                     "Start Game", "red", "green", audio.menu_start_press_audio, audio.menu_start_hover_audio,
@@ -58,7 +59,6 @@ class MainMenu:
         
     
     def start_game(self) -> Literal['game_loop']:
-        audio.start_music("game_loop") # Start music for game loop
         return "game_loop"
     
     def quit_game(self) -> Literal['quit']:

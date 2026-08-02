@@ -30,18 +30,10 @@ class Button(Generic[T]):
         if event.type == pygame.MOUSEMOTION:
             self.hovered_over = self.button.collidepoint(event.pos)
             
-        # If the button was pressed and was being hovered over
+        # If the mouse was pressed and the button was being hovered over
         elif event.type == pygame.MOUSEBUTTONDOWN and self.hovered_over:
-            
             self.audio_channel = audio.play_effect(self.press_audio) # Play press audio
-            
-            # If the audio was playing, then start pending for audio finish checks
-            if self.audio_channel is not None: 
-                self.pending_callback = True
-                return
-            
-            # Guard against audio not being assigned, so just return immediately
-            return self.callback()
+            self.pending_callback = True # Start pending for callback after audio is finished
         
         # If button isn't pending the callback and was just hovered over, play hover audio once
         if not self.pending_callback and (not old_hover_state and self.hovered_over):

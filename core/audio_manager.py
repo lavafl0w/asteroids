@@ -83,6 +83,11 @@ class AudioManager:
             music.load('assets/audio/music/music_glorious_morning.mp3')
             music.set_volume(0.4)
             self.toggle_music()
+        
+        elif scene == "damage_report":
+            music.load('assets/audio/music/music_wii_menu.mp3')
+            music.set_volume(0.2)
+            self.toggle_music()
             
     def toggle_music(self) -> None:
         """Music on/off"""    

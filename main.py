@@ -1,4 +1,6 @@
 # INTERNAL COMPONENT IMPORTS
+from typing import NoReturn
+
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 import core.setup as setup
 from core.audio_manager import audio
@@ -21,31 +23,33 @@ def main() -> None:
     # Delta time - track change in time between loops
     dt = 0.0
 
-    current_scene_name = "main_menu"
+    current_scene_name = "main_menu" #! Switch back to main menu
     
     # 'active_scenes_dict' is what holds the returned dict from scene_store
     # this is needed due to scene_store being a function
     active_scenes_dict = scene_store(current_scene_name)
-    next_requested_scene_name = None
     
-    audio.start_music("main_menu")
+    next_requested_scene_name = None
+    #audio.start_music(current_scene_name)
     
     #* Game Loop #
-    while True:    
+    while True:
+        
         # Get the actual scene object for the current scene name.
         # Example: "main_menu" -> MainMenu instance.
         current_scene = active_scenes_dict[current_scene_name]
         
         events = pygame.event.get()
-        for event in events: # This makes the close button on the window work
+        
+        # This makes the close button on the window work
+        for event in events: 
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return
-        
-        # Scenes can request a scene change from input events.
+
         next_requested_scene_name = current_scene.handle_events(events)
-        if next_requested_scene_name is not None: # If a new scene has been requested
-            # Check it's not a change to quit instead
+        
+        if next_requested_scene_name is not None:
             if next_requested_scene_name == 'quit':
                 pygame.quit()
                 return
@@ -53,41 +57,40 @@ def main() -> None:
             # Get a new dict with the next scene added
             active_scenes_dict = scene_store(next_requested_scene_name)
             
+            if next_requested_scene_name == "game_loop_restart":
+                next_requested_scene_name = "game_loop"
+                    
             # Make it the new current scene and remove change request
             current_scene_name = next_requested_scene_name
             next_requested_scene_name = None
-            
+                    
             # Switch the current scene object to what was just requested
-            current_scene = active_scenes_dict[current_scene_name]
-            
-        # Scenes can also request a scene change from game logic.
-        # Example: GameLoop.update() can request "death_pause".
+            current_scene = active_scenes_dict[current_scene_name]   
+
         next_requested_scene_name = current_scene.update(dt)
-        if next_requested_scene_name is not None: # If a new scene was requested
-            # Check if it was to quit instead
+        
+        if next_requested_scene_name is not None:    
             if next_requested_scene_name == 'quit':
                 pygame.quit()
                 return
-            
-            # If the next scene is going to be 'death_pause'
-            if next_requested_scene_name == "death_pause":
-                # Check it didn't come from anywhere except GameLoop (to quiet the linter)
+
+            if next_requested_scene_name == "death_transition":
                 if not isinstance(current_scene, scene_manager.GameLoop):
-                    raise TypeError("death_pause can only be requested from GameLoop")
-                
-                # Get the death channel that was stored for death audio
+                    raise TypeError("death_transition can only be requested from GameLoop")
+
+                # Get the new dict with the DeathTransition added, passing in death channel
                 death_channel = current_scene.death_audio_channel
-                # Get the new dict with the DeathPause added, passing in death channel
-                active_scenes_dict = scene_store(next_requested_scene_name, death_channel)
+                active_scenes_dict = scene_store(next_requested_scene_name, screen, death_channel)
+                
             else: 
-                # It wasn't 'death_pause', so just get the updated dict with the new Scene
-                active_scenes_dict = scene_store(next_requested_scene_name)
-            
-            # Make it the new current scene and remove change request
+                # It wasn't death_transition, get normal scene
+                active_scenes_dict = scene_store(next_requested_scene_name) 
+
+            # Change current scene name and remove change request
             current_scene_name = next_requested_scene_name
             next_requested_scene_name = None
-            
-            # Switch the current scene object to the new one that was requested
+
+            # Switch current scene to the new scene
             current_scene = active_scenes_dict[current_scene_name]
             
         # Draw whatever the current scene is
@@ -96,7 +99,8 @@ def main() -> None:
         # After all events/checks are done
         pygame.display.flip() # Refresh display
         dt = pygame_clock.tick(60) / 1000 # Ticks at 60 FPS (divide 1000 for milliseconds)
-
+    
+    
 if __name__ == "__main__":
     main()
  
