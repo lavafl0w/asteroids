@@ -23,7 +23,11 @@ class AudioManager:
     bomb_explosion_sound: pygame.mixer.Sound | None = None
     bomb_countdown_sound: pygame.mixer.Sound | None = None
     # Asteroid
-    asteroid_split_sound: pygame.mixer.Sound | None = None 
+    asteroid_split_sound: pygame.mixer.Sound | None = None
+    # Pause
+    pause_game_1: pygame.mixer.Sound | None = None
+    pause_game_2: pygame.mixer.Sound | None = None
+    pause_game_3: pygame.mixer.Sound | None = None
     
     def __init__(self) -> None:
         pass
@@ -55,6 +59,10 @@ class AudioManager:
         self.bomb_countdown_sound = sound_effect("assets/audio/bombs/bomb_countdown_beep.mp3")
         # Asteroids
         self.asteroid_split_sound = sound_effect("assets/audio/asteroids/orb.mp3")
+        # Pause
+        self.pause_game_1 = sound_effect("assets/audio/scenes/pause/mincraft-villager-sound.mp3")
+        self.pause_game_2 = sound_effect("assets/audio/scenes/pause/minecraft-2.mp3")
+        self.pause_game_3 = sound_effect("assets/audio/scenes/pause/minecraft-3.mp3")
 
     def play_effect(self, sound_effect:pygame.mixer.Sound | None) -> pygame.mixer.Channel | None:
         """Plays the passed in sound effect, returns the channel it's playing on."""
@@ -96,5 +104,11 @@ class AudioManager:
             return
 
         pygame.mixer.music.play(-1)
+        
+    def pause_play_music(self) -> None:
+        if pygame.mixer.music.get_busy():
+            pygame.mixer.music.pause()
+        else:
+            pygame.mixer.music.unpause()
         
 audio = AudioManager()

@@ -165,7 +165,6 @@ class Player(CircleShape):
 
             
 class ShieldPowerup(CircleShape):
-    
     def __init__(self, x, y) -> None:
         super().__init__(x, y, radius = SHIELD_RADIUS)
         self.activated = True

@@ -3,8 +3,9 @@ from typing import Callable
 from scenes.main_menu import MainMenu
 from scenes.game_loop import GameLoop
 from scenes.death_transition import DeathTransition, DamageReport
+from scenes.pause_menu import PauseMenu
 
-Scene = MainMenu | GameLoop | DeathTransition | DamageReport
+Scene = MainMenu | GameLoop | DeathTransition | DamageReport | PauseMenu
 SceneStore = dict[str, Scene]
 
 def create_scene_store() -> Callable[..., SceneStore]:
@@ -30,6 +31,9 @@ def create_scene_store() -> Callable[..., SceneStore]:
             del active_scenes[scene_name] # Delete current game loop
             del active_scenes["death_transition"]
             del active_scenes["damage_report"]
+        
+        if scene_name == "game_loop" and active_scenes.get("pause_menu"):
+            del active_scenes["pause_menu"]
             
         # If the scene already exists, skip the scene creation
         if active_scenes.get(scene_name) is not None:
@@ -45,6 +49,9 @@ def create_scene_store() -> Callable[..., SceneStore]:
                 active_scenes[scene_name] = DeathTransition(screen, death_channel)
         elif scene_name == "damage_report":
             active_scenes[scene_name] = DamageReport()
+        elif scene_name == "pause_menu":
+            if screen is not None:
+                active_scenes[scene_name] = PauseMenu(screen)
         return active_scenes
     
     return prepare_scene

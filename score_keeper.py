@@ -16,6 +16,7 @@ class ScoreKeeperClass:
     items_picked_up:int = 0 # How many total items picked up // right now, this also includes bombs
     bombs_activated:int = 0 # How many bombs got activated
     player_lives: int = 0 # Current player lives
+    shield_active: bool = False
 
     def tick_time(self, dt:float) -> None:
         self.time_passed += dt

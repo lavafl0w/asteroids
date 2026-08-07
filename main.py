@@ -1,6 +1,4 @@
 # INTERNAL COMPONENT IMPORTS
-from typing import NoReturn
-
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 import core.setup as setup
 from core.audio_manager import audio
@@ -23,7 +21,7 @@ def main() -> None:
     # Delta time - track change in time between loops
     dt = 0.0
 
-    current_scene_name = "main_menu" #! Switch back to main menu
+    current_scene_name = "main_menu"
     
     # 'active_scenes_dict' is what holds the returned dict from scene_store
     # this is needed due to scene_store being a function
@@ -32,7 +30,7 @@ def main() -> None:
     next_requested_scene_name = None
     #audio.start_music(current_scene_name)
     
-    #* Game Loop #
+    #* GAME LOOP #
     while True:
         
         # Get the actual scene object for the current scene name.
@@ -47,15 +45,18 @@ def main() -> None:
                 pygame.quit()
                 return
 
+        #* HANDLE_EVENTS FUNCTION
         next_requested_scene_name = current_scene.handle_events(events)
-        
         if next_requested_scene_name is not None:
             if next_requested_scene_name == 'quit':
                 pygame.quit()
                 return
             
-            # Get a new dict with the next scene added
-            active_scenes_dict = scene_store(next_requested_scene_name)
+            if next_requested_scene_name == "pause_menu":
+                active_scenes_dict = scene_store(next_requested_scene_name, screen)
+            else:
+                # Get a new dict with the next scene added
+                active_scenes_dict = scene_store(next_requested_scene_name)
             
             if next_requested_scene_name == "game_loop_restart":
                 next_requested_scene_name = "game_loop"
@@ -67,8 +68,8 @@ def main() -> None:
             # Switch the current scene object to what was just requested
             current_scene = active_scenes_dict[current_scene_name]   
 
+        #* UPDATE FUNCTION
         next_requested_scene_name = current_scene.update(dt)
-        
         if next_requested_scene_name is not None:    
             if next_requested_scene_name == 'quit':
                 pygame.quit()
@@ -93,7 +94,7 @@ def main() -> None:
             # Switch current scene to the new scene
             current_scene = active_scenes_dict[current_scene_name]
             
-        # Draw whatever the current scene is
+        #* DRAW FUNCTION
         current_scene.draw(screen)
 
         # After all events/checks are done

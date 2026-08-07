@@ -22,16 +22,16 @@ class GameLoop:
         self.asteroid_field = AsteroidField()
         
         # HUD display
-        self.hud = HUD()
+        self.hud = HUD(self.player1)
         
         audio.start_music("game_loop")
         self.death_audio_channel: pygame.mixer.Channel | None = None
     
     #FUTURE: Escape should be pause menu    
-    def handle_events(self, events) -> None | Literal['main_menu']:
+    def handle_events(self, events) -> None | Literal['pause_menu']:
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                return "main_menu"
+                return "pause_menu"
     
     def draw(self, screen: pygame.Surface) -> None:
         # Wipe with background image 

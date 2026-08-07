@@ -45,6 +45,7 @@ class DeathTransition:
             return 'damage_report'
 
 class DamageReport:
+    '''This is the stats screen'''
     def __init__(self) -> None:
         self.title_font_obj = pygame.font.SysFont(None, 80)
         self.body_font_obj = pygame.font.SysFont(None, 36)
