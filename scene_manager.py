@@ -13,7 +13,7 @@ def create_scene_store() -> Callable[..., SceneStore]:
     # prepare_scene() without needing to be global.
     active_scenes: SceneStore = {}
     
-    def prepare_scene(scene_name: str, screen: pygame.Surface | None = None, death_channel: pygame.mixer.Channel | None = None) -> SceneStore:
+    def prepare_scene(scene_name: str, screen: pygame.Surface, death_channel: pygame.mixer.Channel | None = None) -> SceneStore:
         """ This function is returned to main.py as `scene_store`.
         main.py asks for a scene by name, and this function makes sure the
         correct scene object exists in active_scenes before returning the dict."""
@@ -43,15 +43,14 @@ def create_scene_store() -> Callable[..., SceneStore]:
         if scene_name == "main_menu":
             active_scenes[scene_name] = MainMenu()        
         elif scene_name == "game_loop":
-            active_scenes[scene_name] = GameLoop()
+            active_scenes[scene_name] = GameLoop(screen)
         elif scene_name == "death_transition":
-            if screen is not None and death_channel is not None:
+            if death_channel is not None:
                 active_scenes[scene_name] = DeathTransition(screen, death_channel)
         elif scene_name == "damage_report":
             active_scenes[scene_name] = DamageReport()
         elif scene_name == "pause_menu":
-            if screen is not None:
-                active_scenes[scene_name] = PauseMenu(screen)
+            active_scenes[scene_name] = PauseMenu(screen)
         return active_scenes
     
     return prepare_scene

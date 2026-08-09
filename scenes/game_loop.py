@@ -10,7 +10,7 @@ from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from core.audio_manager import audio
 
 class GameLoop:
-    def __init__(self) -> None:
+    def __init__(self, screen: pygame.Surface) -> None:
         # Load background image
         self.background = pygame.image.load("assets/images/space_background.png")
     
@@ -22,7 +22,7 @@ class GameLoop:
         self.asteroid_field = AsteroidField()
         
         # HUD display
-        self.hud = HUD(self.player1)
+        self.hud = HUD(screen, self.player1)
         
         audio.start_music("game_loop")
         self.death_audio_channel: pygame.mixer.Channel | None = None
@@ -40,10 +40,14 @@ class GameLoop:
         for item in self.container_groups["drawable"]:
             item.draw(screen)
         
-        # Apply the hud surface to the display over drawn sprites
-        screen.blit(self.hud.hud_surface, (0,SCREEN_HEIGHT - 50))
+        self.hud.draw_hud()
         
-        pygame.draw.line(screen, "red", (SCREEN_WIDTH/2,SCREEN_HEIGHT/2), self.player1.position)
+        # Apply the hud surface to the display over drawn sprites
+        #screen.blit(self.hud.lower_hud_surface, (0,SCREEN_HEIGHT - 50))
+        #screen.blit(self.hud.shield_hud_surface, (0,SCREEN_HEIGHT - 50))
+        
+        #! Used for debug
+        #! pygame.draw.line(screen, "red", (SCREEN_WIDTH/2,SCREEN_HEIGHT/2), self.player1.position)
     
     def update(self, dt:float) -> None | Literal['death_transition']:
         # Increase game time

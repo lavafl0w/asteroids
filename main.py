@@ -25,7 +25,7 @@ def main() -> None:
     
     # 'active_scenes_dict' is what holds the returned dict from scene_store
     # this is needed due to scene_store being a function
-    active_scenes_dict = scene_store(current_scene_name)
+    active_scenes_dict = scene_store(current_scene_name, screen)
     
     next_requested_scene_name = None
     
@@ -51,11 +51,11 @@ def main() -> None:
                 pygame.quit()
                 return
             
-            if next_requested_scene_name == "pause_menu":
-                active_scenes_dict = scene_store(next_requested_scene_name, screen)
-            else:
+            #if next_requested_scene_name == "pause_menu":
+            active_scenes_dict = scene_store(next_requested_scene_name, screen)
+            #else:
                 # Get a new dict with the next scene added
-                active_scenes_dict = scene_store(next_requested_scene_name)
+            #    active_scenes_dict = scene_store(next_requested_scene_name)
             
             if next_requested_scene_name == "game_loop_restart":
                 next_requested_scene_name = "game_loop"
@@ -84,7 +84,7 @@ def main() -> None:
                 
             else: 
                 # It wasn't death_transition, get normal scene
-                active_scenes_dict = scene_store(next_requested_scene_name) 
+                active_scenes_dict = scene_store(next_requested_scene_name, screen) 
 
             # Change current scene name and remove change request
             current_scene_name = next_requested_scene_name
