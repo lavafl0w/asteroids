@@ -16,10 +16,10 @@ class MainMenu:
         audio.start_music('main_menu')
         
         self.start_button = Button(150, 75, (SCREEN_WIDTH/2, 350), self.button_font, 
-                                    "Start Game", "red", "green", audio.menu_start_press_audio, audio.menu_start_hover_audio,
+                                    "Start Game", "#722020", "green", audio.menu_start_press_audio, audio.menu_start_hover_audio,
                                     self.start_game)
         self.quit_button = Button(150, 75, (SCREEN_WIDTH/2, 650), self.button_font, 
-                                    "Quit", "red", "green", audio.menu_quit_press_audio, audio.menu_quit_hover_audio,
+                                    "Quit", "#722020", "green", audio.menu_quit_press_audio, audio.menu_quit_hover_audio,
                                     self.quit_game)
                 
     def handle_events(self, events) -> None | MainMenuAction:

@@ -15,7 +15,7 @@ class Bomb(BaseItemPowerup):
     
     def __init__(self, x:float, y:float) -> None:
         super().__init__(x, y)
-        self.color = "blue"
+        self.color = "#ff8300"
         self.time_before_detonation = BOMB_DETONATE_COUNTDOWN_TIME
         
     def get_item_shape(self) -> pygame.Rect:        

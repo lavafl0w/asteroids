@@ -22,8 +22,8 @@ class HUD:
         self.lower_hud_rect = self.lower_hud_surface.get_rect()
         self.shield_surface_rect = self.shield_hud_surface.get_rect()
         
-        self.lower_hud_color = "#262626"
-        self.shield_hud_color = "#262626"
+        self.lower_hud_background_color = "#262626"
+        self.shield_hud_background_color = "#262626"
         
         self.total_seconds_elapsed = 0
         
@@ -50,7 +50,7 @@ class HUD:
         screen that's attached to the class itself, the HUD screen gets blitted onto the main screen by main.py"""
            
         # Wipe the HUD screen before a new draw
-        self.lower_hud_surface.fill(self.lower_hud_color)
+        self.lower_hud_surface.fill(self.lower_hud_background_color)
         blit_sequence = []
         
         minutes_elapsed, seconds_elapsed = divmod(self.total_seconds_elapsed, 60)
@@ -137,7 +137,7 @@ class HUD:
             self.shield_time_remain = 0
             
     def draw_shield_hud(self) -> None:
-        self.shield_hud_surface.fill(self.shield_hud_color)
+        self.shield_hud_surface.fill(self.shield_hud_background_color)
         
         # Local layout happens inside shield_hud_surface, so these rects use
         # coordinates relative to the 250x50 shield HUD panel.
@@ -148,7 +148,7 @@ class HUD:
         
         title_rect = pygame.Rect(0, 0, hud_surface_panel_width, title_rect_height)
         
-        shield_title_surface = self.shield_title_font.render("SHIELD ACTIVATED!11!1!!1", 1, "orange")
+        shield_title_surface = self.shield_title_font.render("SHIELD ACTIVATED!11!1!!1", 1, "#00c2ff")
         shield_title_rect = shield_title_surface.get_rect()
         shield_title_rect.center = title_rect.center
         self.shield_hud_surface.blit(shield_title_surface, shield_title_rect)
@@ -167,12 +167,12 @@ class HUD:
             stats_rect_height,
         )
         
-        stat_hits_surface = self.shield_text_font.render(f"Hits: {self.shield_hits_remain}", 1, "orange")
+        stat_hits_surface = self.shield_text_font.render(f"Hits: {self.shield_hits_remain}", 1, "#00c2ff")
         stat_hit_rect = stat_hits_surface.get_rect()
         stat_hit_rect.center = hit_rect.center
         self.shield_hud_surface.blit(stat_hits_surface, stat_hit_rect)
         
-        stat_time_surface = self.shield_text_font.render(f"Active: {self.shield_time_remain}", 1, "orange")
+        stat_time_surface = self.shield_text_font.render(f"Active: {self.shield_time_remain}", 1, "#00c2ff")
         stat_time_rect = stat_time_surface.get_rect()
         stat_time_rect.center = time_rect.center
         self.shield_hud_surface.blit(stat_time_surface, stat_time_rect)

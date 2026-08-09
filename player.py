@@ -34,7 +34,7 @@ class Player(CircleShape):
         self.hit_cooldown = 0
         self.active_shield = None
         self.bullets_fired = 0
-        self.player_effect_add("shield") #!
+        self.player_effect_add("shield")
 
     # Simply create triangle points
     def triangle(self) -> TriangleShape:
@@ -177,7 +177,7 @@ class ShieldPowerup(CircleShape):
         self.shield_time_remaining = SHIELD_ACTIVE_TIME
         self.shield_hits_remaining = SHIELD_MAX_HIT
         self.shield_hit_cooldown = 0
-        self.color = "orange"
+        self.color = "#00c2ff"
         
         audio.play_effect(audio.shield_activate_effect) # Shield was created/activated
         
@@ -197,7 +197,7 @@ class ShieldPowerup(CircleShape):
         if self.shield_hit_cooldown > 0:
             self.color = "red"
         else:
-            self.color = "orange"
+            self.color = "#00c2ff"
     
     # Switch shield being activated and kills it        
     def shield_deactivate(self) -> None:

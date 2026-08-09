@@ -32,7 +32,7 @@ def create_scene_store() -> Callable[..., SceneStore]:
             del active_scenes["death_transition"]
             del active_scenes["damage_report"]
         
-        if scene_name == "game_loop" and active_scenes.get("pause_menu"):
+        if (scene_name == "game_loop" or scene_name == "main_menu") and active_scenes.get("pause_menu"):
             del active_scenes["pause_menu"]
             
         # If the scene already exists, skip the scene creation

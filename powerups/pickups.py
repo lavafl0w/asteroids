@@ -6,7 +6,7 @@ from constants import SHIELD_ITEM_PICKUP_RADIUS, HEALTH_PICKUP_RADIUS
 # Shield powerup on screen
 class ShieldPowerupItem(BaseItemPowerup):    
     hitbox_kind = "circle"
-    color = "orange"
+    color = "#00c2ff"
     
     def __init__(self, x, y) -> None:
         super().__init__(x, y, SHIELD_ITEM_PICKUP_RADIUS)

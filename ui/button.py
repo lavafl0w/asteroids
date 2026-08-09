@@ -39,10 +39,13 @@ class Button(Generic[T]):
         if not self.pending_callback and (not old_hover_state and self.hovered_over):
             self.audio_channel = audio.play_effect(self.hover_audio)
     
-    def draw(self, screen:pygame.Surface) -> None:
+    def draw(self, screen:pygame.Surface, centre_pos: tuple[int, int] | None = None) -> None:
+        if centre_pos is not None:
+            self.button.center = centre_pos
+            
         # Draw the overall/entire button rect coloured on screen
         colour = self.hover_color if self.hovered_over else self.base_color
-        pygame.draw.rect(screen, colour, self.button)
+        pygame.draw.rect(screen, colour, self.button, border_radius=14)
         
         # Make the text surface, get the rect for it and position it in centre of button
         text_surface = self.font.render(self.button_text, 1, "white")
