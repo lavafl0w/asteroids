@@ -26,8 +26,7 @@ class GameLoop:
         
         audio.start_music("game_loop")
         self.death_audio_channel: pygame.mixer.Channel | None = None
-    
-    #FUTURE: Escape should be pause menu    
+
     def handle_events(self, events) -> None | Literal['pause_menu']:
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:

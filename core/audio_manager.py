@@ -69,9 +69,7 @@ class AudioManager:
         self.pause_menu_button_press = sound_effect("assets/audio/pause_menu/noob.mp3")
 
     def play_effect(self, sound_effect:pygame.mixer.Sound | None) -> pygame.mixer.Channel | None:
-        """Plays the passed in sound effect, returns the channel it's playing on."""
-        #TODO if sound effect name does not exist, error
-            
+        """Plays the passed in sound effect, returns the channel it's playing on."""            
         if sound_effect is not None:
             channel = sound_effect.play()
             return channel

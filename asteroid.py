@@ -11,6 +11,7 @@ import random
 
 #! Currently only uses circle collision logic instead of actual shape collision
 class Asteroid(CircleShape):
+    #hitbox_kind = "asteroid"
     
     def __init__(self, x: float, y: float, radius: float) -> None:
         super().__init__(x, y, radius)
@@ -21,7 +22,7 @@ class Asteroid(CircleShape):
         if debug_flags.check("DEBUG_ASTEROID_POLYGON_OUTLIERS"): #! DEBUG
             self.debug_polygon_outliers()
 
-        world_point_coords = [self.position + point for point in self.local_point_coords]
+        world_point_coords = self.get_world_coords()
         pygame.draw.polygon(screen, self.color, world_point_coords, LINE_WIDTH)
 
     def debug_polygon_outliers(self) -> None: #! DEBUG
@@ -151,3 +152,17 @@ class Asteroid(CircleShape):
             local_coords.append(segement_coord)
         
         return local_coords
+    
+    def get_world_coords(self) -> list[pygame.Vector2]:
+        return [self.position + point for point in self.local_point_coords]
+    
+    def get_asteroid_edges(self) -> list[tuple[pygame.Vector2, pygame.Vector2]]:
+        point_coords = self.get_world_coords()
+        
+        asteroid_edges = []
+        for point_index in range(0, len(point_coords) - 1):
+            asteroid_edges.append((point_coords[point_index], 
+                                   point_coords[point_index + 1]))
+        asteroid_edges.append((point_coords[-1], point_coords[0]))
+        
+        return asteroid_edges

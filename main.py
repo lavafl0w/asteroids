@@ -50,12 +50,8 @@ def main() -> None:
             if next_requested_scene_name == 'quit':
                 pygame.quit()
                 return
-            
-            #if next_requested_scene_name == "pause_menu":
+
             active_scenes_dict = scene_store(next_requested_scene_name, screen)
-            #else:
-                # Get a new dict with the next scene added
-            #    active_scenes_dict = scene_store(next_requested_scene_name)
             
             if next_requested_scene_name == "game_loop_restart":
                 next_requested_scene_name = "game_loop"

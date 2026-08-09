@@ -34,7 +34,7 @@ class Player(CircleShape):
         self.hit_cooldown = 0
         self.active_shield = None
         self.bullets_fired = 0
-        self.player_effect_add("shield")
+        #self.player_effect_add("shield")
 
     # Simply create triangle points
     def triangle(self) -> TriangleShape:

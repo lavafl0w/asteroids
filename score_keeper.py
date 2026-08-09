@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from constants import BASIC_ASTEROID_DESTOYED_SHOT, BASIC_ASTEROID_SPLIT_SHOT, BOMB_DESTROY, SHIELD_DESTROY
+from constants import BASIC_ASTEROID_DESTOYED_SHOT_POINTS, BASIC_ASTEROID_SPLIT_SHOT_POINTS, BOMB_DESTROYED_POINTS, SHIELD_DESTROYED_POINTS
 
 # Made it a dataclass cause why not
 # This sort just handles basically the __init__ part, automatically assigning the values like normal
@@ -41,13 +41,13 @@ class ScoreKeeperClass:
         
     def add_score(self, score_modifier_item: str | None = None) -> None:
         if score_modifier_item is None or score_modifier_item == "basic_kill":
-            self.total_score += BASIC_ASTEROID_DESTOYED_SHOT
+            self.total_score += BASIC_ASTEROID_DESTOYED_SHOT_POINTS
         elif score_modifier_item == "asteroid_split":
-            self.total_score += BASIC_ASTEROID_SPLIT_SHOT
+            self.total_score += BASIC_ASTEROID_SPLIT_SHOT_POINTS
         elif score_modifier_item == "bomb_kill":
-            self.total_score += BOMB_DESTROY
+            self.total_score += BOMB_DESTROYED_POINTS
         elif score_modifier_item == "shield_kill":
-            self.total_score += SHIELD_DESTROY
+            self.total_score += SHIELD_DESTROYED_POINTS
 
 # Used to refer back to the same object to track updating values
 ScoreKeeper = ScoreKeeperClass()
