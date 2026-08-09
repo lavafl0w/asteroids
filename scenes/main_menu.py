@@ -8,8 +8,8 @@ MainMenuAction = Literal['game_loop', 'quit']
 
 class MainMenu:
     def __init__(self) -> None:
-        self.title_font = pygame.font.Font(None, 64)
-        self.button_font = pygame.font.Font(None, 32)
+        self.title_font = pygame.font.Font("assets/fonts/orbitron/Orbitron-Bold.ttf", 64)
+        self.button_font = pygame.font.Font("assets/fonts/exo/Exo-Regular.ttf", 25)
         self.menu_background = pygame.image.load("assets/images/amazing_menu_background.png")
         
         self.audio_channel: pygame.mixer.Channel | None = None

@@ -8,9 +8,9 @@ class HUD:
         self.main_screen: pygame.Surface = screen
         self.player = player
         
-        self.bottom_bar_font = pygame.font.SysFont(None, 32)
-        self.shield_title_font = pygame.font.SysFont(None, 26)
-        self.shield_text_font = pygame.font.SysFont(None, 20)
+        self.bottom_bar_font = pygame.font.Font("assets/fonts/sharetech/ShareTech-Regular.ttf", 32)
+        self.shield_title_font = pygame.font.Font("assets/fonts/orbitron/Orbitron-Medium.ttf", 16)
+        self.shield_text_font = pygame.font.Font("assets/fonts/sharetech/ShareTech-Regular.ttf", 16)
         
         # Smaller canvases for HUD elements before they are placed on the screen.
         self.lower_hud_surface:pygame.Surface = pygame.Surface((SCREEN_WIDTH, 45))
@@ -62,7 +62,6 @@ class HUD:
             f"Score: xxxxxx",
             #f"Bullets Fired: {ScoreKeeper.bullets_fired}",
             #f"Asteroids Destroyed: {ScoreKeeper.asteroids_shot}", 
-            #f"Shield {self.shield_active} -- hits: {self.shield_hits_remain} -- time: {self.shield_time_remain}"
         ]
         
         # Split the hud into even segments

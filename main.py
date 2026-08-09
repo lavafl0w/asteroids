@@ -21,7 +21,7 @@ def main() -> None:
     # Delta time - track change in time between loops
     dt = 0.0
 
-    current_scene_name = "main_menu"
+    current_scene_name = "pause_menu"
     
     # 'active_scenes_dict' is what holds the returned dict from scene_store
     # this is needed due to scene_store being a function
@@ -29,7 +29,7 @@ def main() -> None:
     
     next_requested_scene_name = None
     
-    #* GAME LOOP #
+    #* PROGRAM LOOP #
     while True:
         
         # Get the actual scene object for the current scene name.

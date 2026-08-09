@@ -47,8 +47,8 @@ class DeathTransition:
 class DamageReport:
     '''This is the stats screen'''
     def __init__(self) -> None:
-        self.title_font_obj = pygame.font.SysFont(None, 80)
-        self.body_font_obj = pygame.font.SysFont(None, 36)
+        self.title_font_obj = pygame.font.Font("assets/fonts/orbitron/Orbitron-Bold.ttf", 60)
+        self.body_font_obj = pygame.font.Font("assets/fonts/exo/Exo-Regular.ttf", 36)
         self.background = (8, 12, 22)
         audio.start_music('damage_report')
         
