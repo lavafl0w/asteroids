@@ -1,4 +1,6 @@
 from circle_shape import CircleShape
+from shot import Shot
+from player import ShieldPowerup
 from core.audio_manager import audio
 from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH, SCREEN_WIDTH, SCREEN_HEIGHT
 from powerups.drops import check_powerup_drop
@@ -48,7 +50,7 @@ class Asteroid(CircleShape):
         ):  
             self.kill() 
 
-    def split(self) -> None:
+    def split(self, interactor:CircleShape) -> None:
         """Handles splitting of asteroids into smaller/faster ones when hit"""
         self.kill() # Regardless of size, destroy it
         
@@ -56,10 +58,16 @@ class Asteroid(CircleShape):
 
         # This was a small asteroid
         if self.radius <= ASTEROID_MIN_RADIUS:
-            ScoreKeeper.asteroid_was_shot()
             check_powerup_drop(self.position) # Roll for a possible powerup
+            if isinstance(interactor, Shot):
+                ScoreKeeper.asteroid_was_shot()
+                ScoreKeeper.add_score("basic_kill")
+            elif isinstance(interactor, ShieldPowerup):
+                ScoreKeeper.add_score("shield_kill")
             return
 
+        ScoreKeeper.add_score("asteroid_split")
+        
         new_rotation = random.uniform(20, 50)
         
         # Creates new rotation vectors for smaller asteroids
@@ -71,7 +79,7 @@ class Asteroid(CircleShape):
         # Create new asteroids at current position, use the new radius and apply velocity
         Asteroid(self.position.x, self.position.y, new_radius).velocity = new_velocity_1 * 1.2
         Asteroid(self.position.x, self.position.y, new_radius).velocity = new_velocity_2 * 1.2
-
+        
     def bounce(self, bounce_object: CircleShape) -> None:
         """Handles bouncing the direction of the asteroid away"""
         #TODO: This 'bouncing' is more like 'sliding around' each other rn lol

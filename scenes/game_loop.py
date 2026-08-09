@@ -41,13 +41,6 @@ class GameLoop:
             item.draw(screen)
         
         self.hud.draw_hud()
-        
-        # Apply the hud surface to the display over drawn sprites
-        #screen.blit(self.hud.lower_hud_surface, (0,SCREEN_HEIGHT - 50))
-        #screen.blit(self.hud.shield_hud_surface, (0,SCREEN_HEIGHT - 50))
-        
-        #! Used for debug
-        #! pygame.draw.line(screen, "red", (SCREEN_WIDTH/2,SCREEN_HEIGHT/2), self.player1.position)
     
     def update(self, dt:float) -> None | Literal['death_transition']:
         # Increase game time
@@ -89,7 +82,7 @@ class GameLoop:
             for interactor in self.container_groups["asteroid_interactors"]:
                 if collides(asteroid, interactor):
                     if interactor.hit(): # If the hit connected...            
-                        asteroid.split() # Call asteroid split logic
+                        asteroid.split(interactor) # Call asteroid split logic
                     else:
                         asteroid.bounce(interactor) # Bounce away from it (for shield on cooldown)
                     
@@ -97,6 +90,5 @@ class GameLoop:
             for explosion in self.container_groups["explosion_radii"]:
                 if collides(asteroid, explosion):
                     ScoreKeeper.asteroid_was_exploded()
+                    ScoreKeeper.add_score("bomb_kill")
                     asteroid.kill()
-                    #FUTURE: To add further into keeping score mechanic, 
-                    #FUTURE: this could be different score because it was a bomb

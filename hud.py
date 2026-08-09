@@ -59,7 +59,7 @@ class HUD:
         hud_lines = [
             f"Time Elapsed: {minutes_elapsed}:{seconds_elapsed:02}",
             f"Lives: {ScoreKeeper.player_lives}",
-            f"Score: xxxxxx",
+            f"Score: {ScoreKeeper.total_score}",
             #f"Bullets Fired: {ScoreKeeper.bullets_fired}",
             #f"Asteroids Destroyed: {ScoreKeeper.asteroids_shot}", 
         ]
