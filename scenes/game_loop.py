@@ -42,6 +42,8 @@ class GameLoop:
         
         # Apply the hud surface to the display over drawn sprites
         screen.blit(self.hud.hud_surface, (10,10))
+        
+        pygame.draw.line(screen, "red", (SCREEN_WIDTH/2,SCREEN_HEIGHT/2), self.player1.position)
     
     def update(self, dt:float) -> None | Literal['death_transition']:
         # Increase game time

@@ -5,7 +5,7 @@ import pygame
 import random
 
 class PauseMenu:
-    def __init__(self, screen:pygame.Surface):
+    def __init__(self, screen:pygame.Surface) -> None:
         self.pause_screen = screen.copy()
         self.pause_screen.set_alpha(75)
         self.pause_screen.fill((8, 12, 22))
@@ -20,21 +20,21 @@ class PauseMenu:
                 audio.pause_play_music()
                 return "game_loop"
     
-    def draw(self, screen: pygame.Surface):
+    def draw(self, screen: pygame.Surface) -> None:
         screen_rect = screen.get_rect()
         
         screen.blit(self.pause_screen, (0, 0))
         
         pause_surface = self.font_obj.render("PAUSEDDDDDDDDDDDD", 1, "white")
         pause_rect = pause_surface.get_rect()
-        pause_rect.center = screen_rect.center
+        pause_rect.center = (screen_rect.centerx, 50)
         
         screen.blit(pause_surface, pause_rect)
     
-    def update(self, dt:float):
+    def update(self, dt:float) -> None:
         pass
     
-    def play_audio(self):
+    def play_audio(self) -> None:
         match self.random_audio_selection:
             case 1:
                 audio.play_effect(audio.pause_game_1)

@@ -1,4 +1,5 @@
 import pygame
+from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 
 # Base class for game objects
 class CircleShape(pygame.sprite.Sprite):
@@ -6,7 +7,6 @@ class CircleShape(pygame.sprite.Sprite):
     hitbox_kind = "circle"
 
     def __init__(self, x: float, y: float, radius: float) -> None:
-        # we will be using this later
         if hasattr(self, "containers"):
             super().__init__(*self.containers)
         else:
@@ -18,15 +18,26 @@ class CircleShape(pygame.sprite.Sprite):
         self.screen_boundary_margin = self.radius * 5
 
     def draw(self, screen: pygame.Surface) -> None:
-        # must override
         pass
 
     def update(self, dt: float) -> None:
-        # must override
         pass
-        
+    
+    # Returns assigned hitbox for shape for collison detection    
     def get_hitbox(self) -> "HitboxShape":
         return self
+    
+    # Checks if object has moved off screen and flips position
+    def wrap_position(self) -> None:
+        if self.position.x - self.radius > SCREEN_WIDTH:
+            self.position.x = -self.radius
+        elif self.position.x + self.radius < 0:
+            self.position.x = SCREEN_WIDTH + self.radius
+            
+        if self.position.y - self.radius > SCREEN_HEIGHT:
+            self.position.y = -self.radius
+        elif self.position.y + self.radius < 0:
+            self.position.y = SCREEN_HEIGHT + self.radius
     
 TriangleShape = tuple[pygame.Vector2, pygame.Vector2, pygame.Vector2]
 HitboxShape = CircleShape | pygame.Rect | TriangleShape

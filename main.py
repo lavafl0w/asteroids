@@ -28,7 +28,6 @@ def main() -> None:
     active_scenes_dict = scene_store(current_scene_name)
     
     next_requested_scene_name = None
-    #audio.start_music(current_scene_name)
     
     #* GAME LOOP #
     while True:

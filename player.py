@@ -14,6 +14,8 @@ from constants import (
     SHIELD_MAX_HIT,
     SHIELD_ACTIVE_TIME,
     SHIELD_HIT_COOLDOWN,
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT,
 )
 from shot import Shot
 import pygame
@@ -73,6 +75,9 @@ class Player(CircleShape):
         
         # Make the position based off the calculated velocity
         self.position += self.velocity * dt
+        
+        # Check for screen wrapping
+        self.wrap_position()
         
         # Keep track of values from player
         ScoreKeeper.track_player_values(self.player_lives, self.bullets_fired)
