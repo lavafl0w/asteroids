@@ -1,11 +1,13 @@
 import pygame
 from score_keeper import ScoreKeeper
+from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 
 class HUD:
     def __init__(self, player) -> None:
-        self.hud_surface:pygame.Surface = pygame.Surface((200, 150))
+        self.hud_surface:pygame.Surface = pygame.Surface((SCREEN_WIDTH, 50))
         self.hud_color = "black"
         self.hud_surface.fill(self.hud_color)
+        self.hud_rect = self.hud_surface.get_rect()
         self.player = player
         self.lives_color = "white"
         self.previous_player_lives: int | None = None
@@ -37,10 +39,14 @@ class HUD:
         hud_lines = [
             f"Time Elapsed: {minutes}:{seconds:02}",
             f"Lives: {ScoreKeeper.player_lives}",
-            f"Bullets Fired: {ScoreKeeper.bullets_fired}",
-            f"Asteroids Destroyed: {ScoreKeeper.asteroids_shot}", 
-            f"Shield {self.shield_active} -- hits: {self.shield_hits_remain} -- time: {self.shield_time_remain}"
+            f"Score: xxxxxx",
+            #f"Bullets Fired: {ScoreKeeper.bullets_fired}",
+            #f"Asteroids Destroyed: {ScoreKeeper.asteroids_shot}", 
+            #f"Shield {self.shield_active} -- hits: {self.shield_hits_remain} -- time: {self.shield_time_remain}"
         ]
+        
+        # Split the hud into even segments
+        hud_segment = self.hud_rect.width / len(hud_lines)
         
         # For each line, create the text surface, and increase position by 20y per index
         for index, line in enumerate(hud_lines):
@@ -48,9 +54,21 @@ class HUD:
                 text_surface = self.font_object.render(line, 1, self.lives_color)
             else:
                 text_surface = self.font_object.render(line, 1, "white")
+            
+            # Create a rect based off this lines hud segment
+            segment_rect = pygame.Rect(
+                hud_segment * index,
+                0,
+                hud_segment,
+                self.hud_rect.height
+            )
                 
-            # Line 0 = (10, 10) -- Line 1 = (10, 10 + (1*25)) = (10, 35)
-            position = (10, 10 + (index * 25)) 
+            # Get the rect of the variable sized text, positioned in the centre of the segement
+            text_rect = text_surface.get_rect(center = segment_rect.center)    
+            
+            # Position for text is (x, y) == (text.left, text.top)
+            # (Since position is worked out based on top left corner)
+            position = (text_rect.left, text_rect.top) 
             
             # Create a list of all the (text_surface, position) tuples
             blit_sequence.append((text_surface, position))

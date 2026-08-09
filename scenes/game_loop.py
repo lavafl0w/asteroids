@@ -41,7 +41,7 @@ class GameLoop:
             item.draw(screen)
         
         # Apply the hud surface to the display over drawn sprites
-        screen.blit(self.hud.hud_surface, (10,10))
+        screen.blit(self.hud.hud_surface, (0,SCREEN_HEIGHT - 50))
         
         pygame.draw.line(screen, "red", (SCREEN_WIDTH/2,SCREEN_HEIGHT/2), self.player1.position)
     
