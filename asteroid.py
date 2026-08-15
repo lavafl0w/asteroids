@@ -9,9 +9,8 @@ import tools.debug_flags as debug_flags
 import pygame
 import random
 
-#! Currently only uses circle collision logic instead of actual shape collision
 class Asteroid(CircleShape):
-    #hitbox_kind = "asteroid"
+    hitbox_kind = "asteroid"
     
     def __init__(self, x: float, y: float, radius: float) -> None:
         super().__init__(x, y, radius)

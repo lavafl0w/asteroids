@@ -23,9 +23,9 @@ def collides(shape_1: CircleShape, shape_2: CircleShape) -> bool:
                     cast(pygame.Rect, shape_2.get_hitbox()),
                 )
             case "triangle", "circle":
-                return triangle_vs_asteroid(
+                return triangle_vs_circle(
                     cast(TriangleShape, shape_1.get_hitbox()),
-                    cast(Asteroid, shape_2),
+                    cast(CircleShape, shape_2.get_hitbox()),
                 )
             case "triangle", "rect":
                 return triangle_vs_rect(
@@ -36,6 +36,16 @@ def collides(shape_1: CircleShape, shape_2: CircleShape) -> bool:
                 return triangle_vs_asteroid(
                     cast(TriangleShape, shape_1.get_hitbox()),
                     cast(Asteroid, shape_2)
+                )
+            case "circle", "asteroid":
+                return circle_vs_circle(
+                    cast(CircleShape, shape_1.get_hitbox()),
+                    cast(Asteroid, shape_2),
+                )
+            case "asteroid", "asteroid":
+                return asteroid_vs_asteroid(
+                    cast(Asteroid, shape_1),
+                    cast(Asteroid, shape_2),
                 )
             case _:
                 if attempt == 1: # If this is the second pass after they were flipped
@@ -58,16 +68,39 @@ def circle_vs_circle(circle_1: CircleShape, circle_2: CircleShape) -> bool:
         
     return False
 
-# TODO: Implement this maybe
-def asteroid_vs_asteroid(asteroid_1, asteroid_2):
+def asteroid_vs_asteroid(asteroid_1: Asteroid, asteroid_2: Asteroid) -> bool:
+    """Check two asteroid polygons against each other."""
     asteroid_1_points = asteroid_1.get_world_coords()
     asteroid_1_edges = asteroid_1.get_asteroid_edges()
     
     asteroid_2_points = asteroid_2.get_world_coords()
     asteroid_2_edges = asteroid_2.get_asteroid_edges()
     
+    # One asteroid can overlap another by having a point inside it.
+    for point in asteroid_1_points:
+        if point_in_polygon(point, asteroid_2_points):
+            return True
+
+    for point in asteroid_2_points:
+        if point_in_polygon(point, asteroid_1_points):
+            return True
+
+    # They can also overlap by having edges cross, even if no point is inside.
+    for asteroid_1_edge in asteroid_1_edges:
+        for asteroid_2_edge in asteroid_2_edges:
+            intersects = check_line_segements_intersect(
+                asteroid_1_edge[0],
+                asteroid_1_edge[1],
+                asteroid_2_edge[0],
+                asteroid_2_edge[1],
+            )
+            if intersects:
+                return True
+
+    return False
     
-def triangle_overlaps_circle(triangle: TriangleShape, circle: CircleShape) -> bool:
+    
+def triangle_vs_circle(triangle: TriangleShape, circle: CircleShape) -> bool:
     """ Player / Asteroid -- Triangle / Circle
     
     Checks whether a circular object overlaps any edge of the triangle.
@@ -179,6 +212,32 @@ def point_in_triangle(triangle: TriangleShape, point: tuple[int, int] | pygame.V
         return True
     
     return False
+
+def point_in_polygon(point: pygame.Vector2, polygon_points: list[pygame.Vector2]) -> bool:
+    """Check if a point is inside a polygon using ray casting."""
+    inside = False
+    point_x = point.x
+    point_y = point.y
+    previous_point = polygon_points[-1]
+
+    for current_point in polygon_points:
+        current_y_above_point = current_point.y > point_y
+        previous_y_above_point = previous_point.y > point_y
+
+        if current_y_above_point != previous_y_above_point:
+            edge_height = previous_point.y - current_point.y
+            edge_width = previous_point.x - current_point.x
+            y_distance_from_current = point_y - current_point.y
+            x_crossing = current_point.x + (
+                edge_width * y_distance_from_current / edge_height
+            )
+
+            if point_x < x_crossing:
+                inside = not inside
+
+        previous_point = current_point
+
+    return inside
 
 def check_line_segements_intersect(point_a, point_b, point_c, point_d) -> bool:
     """Check if a given line segement between AB and CD intersect each other."""
