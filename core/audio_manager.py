@@ -47,7 +47,7 @@ class AudioManager:
         self.player_life_maximum_audio = sound_effect("assets/audio/health/maximum-patrona-lifes.mp3")
         self.player_life_pickup_audio = sound_effect("assets/audio/health/extra-lifee.mp3")
         # Start menu
-        self.menu_start_hover_audio = sound_effect("assets/audio/main_menu/route_jingle.mp3")
+        self.menu_start_hover_audio = sound_effect("assets/audio/main_menu/route_jingle.mp3") #TODO: lower the volume of this
         self.menu_quit_hover_audio = sound_effect("assets/audio/main_menu/bruh.mp3")
         self.menu_start_press_audio = sound_effect("assets/audio/main_menu/good_boy.mp3")
         self.menu_quit_press_audio = sound_effect("assets/audio/main_menu/vine_boom.mp3")
@@ -86,7 +86,7 @@ class AudioManager:
 
         if scene == "main_menu":
             music.load('assets/audio/music/music_san_andreas.mp3')
-            music.set_volume(0.6)
+            music.set_volume(0.4)
             self.toggle_music()
 
         elif scene == "game_loop":

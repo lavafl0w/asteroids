@@ -43,7 +43,7 @@ def collides(shape_1: CircleShape, shape_2: CircleShape) -> bool:
                     cast(Asteroid, shape_2),
                 )
             case "asteroid", "asteroid":
-                return asteroid_vs_asteroid(
+                return circle_vs_circle(
                     cast(Asteroid, shape_1),
                     cast(Asteroid, shape_2),
                 )

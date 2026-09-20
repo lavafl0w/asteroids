@@ -23,6 +23,7 @@ class Asteroid(CircleShape):
 
         world_point_coords = self.get_world_coords()
         pygame.draw.polygon(screen, self.color, world_point_coords, LINE_WIDTH)
+        #pygame.draw.circle(screen, "red", self.position, self.radius, 1)
 
     def debug_polygon_outliers(self) -> None: #! DEBUG
         """Print if a local polygon point is suspiciously far from this asteroid."""
