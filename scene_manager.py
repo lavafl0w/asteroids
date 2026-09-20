@@ -41,9 +41,13 @@ def create_scene_store() -> Callable[..., SceneStore]:
         
         # Creates a scene based on what was passed into scene_name
         if scene_name == "main_menu":
-            active_scenes[scene_name] = MainMenu()        
+            active_scenes[scene_name] = MainMenu()
+            if active_scenes.get("game_loop"): # Remove game loop when returning to menu
+                del active_scenes["game_loop"]
         elif scene_name == "game_loop":
             active_scenes[scene_name] = GameLoop(screen)
+            if active_scenes.get("main_menu"): # Remove main menu screen when starting game
+                del active_scenes["main_menu"]
         elif scene_name == "death_transition":
             if death_channel is not None:
                 active_scenes[scene_name] = DeathTransition(screen, death_channel)

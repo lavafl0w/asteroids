@@ -14,6 +14,8 @@ from constants import (
     SHIELD_MAX_HIT,
     SHIELD_ACTIVE_TIME,
     SHIELD_HIT_COOLDOWN,
+    RAPID_FIRE_COOLDOWN_SECONDS,
+    RAPID_FIRE_ACTIVATION_TIME,
     SCREEN_WIDTH,
     SCREEN_HEIGHT,
 )
@@ -34,7 +36,9 @@ class Player(CircleShape):
         self.hit_cooldown = 0
         self.active_shield = None
         self.bullets_fired = 0
-        #self.player_effect_add("shield")
+        self.rapid_fire_activated = False
+        self.rapid_fire_time = 0
+        #self.player_effect_add("rapid_fire") #!
 
     # Simply create triangle points
     def triangle(self) -> TriangleShape:
@@ -86,6 +90,14 @@ class Player(CircleShape):
         # Decrease any cooldowns    
         self.shot_cooldown -= dt
         self.hit_cooldown -= dt
+        # If rapid fire is actived, reduce the cooldown
+        if self.rapid_fire_time > 0:
+            self.rapid_fire_time -= dt
+            # Since rapid fire is activated, adjust shot cooldown accordingly
+            if self.shot_cooldown > RAPID_FIRE_COOLDOWN_SECONDS:
+                self.shot_cooldown = RAPID_FIRE_COOLDOWN_SECONDS
+            
+        
         
         # If player is safe after last hit, they are red
         if self.hit_cooldown > 0:
@@ -101,6 +113,10 @@ class Player(CircleShape):
             # If shield has been removed
             if not self.active_shield.activated: 
                 self.active_shield = None # Remove link to player
+        
+        # If rapid fire is activated and time has run out, disable it
+        if self.rapid_fire_time <= 0 and self.rapid_fire_activated:
+            self.rapid_fire_activated = False
         
     # Move back and forward
     def move(self, dt: float) -> None:
@@ -123,7 +139,11 @@ class Player(CircleShape):
             # Creates, rotates and increases speed of newly created shot
             bullet.velocity = pygame.math.Vector2(0,1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
             
-            audio.play_effect(audio.player_shot_audio) # Pew pew pew
+            # Play either normal shot sound, or rapid fire shot sound if activated
+            if self.rapid_fire_activated:
+                audio.play_effect(audio.rapid_fire_shot)
+            else:
+                audio.play_effect(audio.player_shot_audio) # Pew pew pew
             
             self.shot_cooldown = PLAYER_SHOT_COOLDOWN_SECONDS # Set shot cooldown to max
             
@@ -168,6 +188,12 @@ class Player(CircleShape):
                 return
             
             audio.play_effect(audio.player_life_maximum_audio) # Play max health audio instead
+        
+        # Add rapid fire    
+        if effect == "rapid_fire":
+            self.rapid_fire_activated = True
+            self.rapid_fire_time = RAPID_FIRE_ACTIVATION_TIME
+            audio.play_effect(audio.rapid_fire_activate)
 
             
 class ShieldPowerup(CircleShape):

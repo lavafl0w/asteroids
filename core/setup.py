@@ -4,7 +4,7 @@ from asteroid_field import AsteroidField
 from shot import Shot
 from asteroid import Asteroid
 from powerups.bomb import Bomb, BombExplosion
-from powerups.pickups import ShieldPowerupItem, HealthPickup
+from powerups.pickups import ShieldPowerupItem, HealthPickup, RapidFirePickup
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from core.audio_manager import audio
 
@@ -53,3 +53,4 @@ def assign_containers(g) -> None:
     BombExplosion.containers = (g["updatable"], g["drawable"], g["explosion_radii"])
     ShieldPowerupItem.containers = (g["updatable"], g["drawable"], g["powerup_items"])
     HealthPickup.containers = (g["updatable"], g["drawable"], g["powerup_items"])
+    RapidFirePickup.containers = (g["updatable"], g["drawable"], g["powerup_items"])

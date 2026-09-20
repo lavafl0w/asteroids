@@ -1,7 +1,7 @@
 import pygame
 from powerups.base import BaseItemPowerup
 from player import Player
-from constants import SHIELD_ITEM_PICKUP_RADIUS, HEALTH_PICKUP_RADIUS
+from constants import SHIELD_ITEM_PICKUP_RADIUS, HEALTH_PICKUP_RADIUS, RAPID_FIRE_ITEM_PICKUP_RADIUS
 
 # Shield powerup on screen
 class ShieldPowerupItem(BaseItemPowerup):    
@@ -54,5 +54,29 @@ class HealthPickup(BaseItemPowerup):
     def activate(self, player: Player | None = None) -> bool | None:
         if player: # Needed just cause player might also be None
             player.player_effect_add("health") # Call function from Player class
+            super().activate() # Deal with main activation
+            self.kill() # Remove from screen
+            
+class RapidFirePickup(BaseItemPowerup):
+    hitbox_kind = "circle"
+    color = "#fc0101"
+    
+    def __init__(self, x, y) -> None:
+        super().__init__(x, y, RAPID_FIRE_ITEM_PICKUP_RADIUS)
+      
+    def draw(self, screen: pygame.Surface) -> None:
+        if self.is_visible: # Needed for flashing despawn
+            # Draws 3 red cicles, diameter of 6, seperated by 2
+            pygame.draw.circle(screen, self.color, pygame.Vector2(self.position.x - 8, self.position.y), 3, 0)
+            pygame.draw.circle(screen, self.color, self.position, 3, 0)
+            pygame.draw.circle(screen, self.color, pygame.Vector2(self.position.x + 8, self.position.y), 3, 0)
+
+    def update(self, dt: float) -> None:
+        if not self.is_activated: # It's not been picked up
+            super().handle_despawn(dt)
+    
+    def activate(self, player: Player | None = None) -> bool | None:
+        if player: # Needed just cause player might also be None
+            player.player_effect_add("rapid_fire") # Call function from Player class
             super().activate() # Deal with main activation
             self.kill() # Remove from screen

@@ -7,7 +7,7 @@ wheels/
 *.egg-info/
 
 # Virtual environments
-.venv/
+.venv*/
 
 # Log Files / Dev
 debug_flags_local.py
