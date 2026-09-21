@@ -1,0 +1,15 @@
+limit how many powerups are on the screen at one time to avoid multiple health items/general boosts at the same time (also maybe powerup cooldown before spawning again?)
+
+different asteroid types 
+(gold is one that is slower, takes more hits to break)
+(red is one that gravitates towards player)
+
+press key to spend score to buy shield, rapid Fire
+
+start off with 3 lives (still max 5)
+
+respawn cost 500 (maybe increases with additional  respawns)
+
+asteroids are filled with dots to give more 'texture'
+
+if lives == 1, flash

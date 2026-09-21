@@ -15,14 +15,31 @@ class Asteroid(CircleShape):
     def __init__(self, x: float, y: float, radius: float) -> None:
         super().__init__(x, y, radius)
         self.local_point_coords: list[pygame.Vector2] = self.create_local_polygon_coords() # Create local polygon points for drawing
+        self.local_dot_texture_coords: list[pygame.Vector2] = self.create_local_dot_texture()
         self.color = "white"
 
     def draw(self, screen: pygame.Surface) -> None:
-        if debug_flags.check("DEBUG_ASTEROID_POLYGON_OUTLIERS"): #! DEBUG
-            self.debug_polygon_outliers()
-
+        # Create a polygon asteroid
         world_point_coords = self.get_world_coords()
         pygame.draw.polygon(screen, self.color, world_point_coords, LINE_WIDTH)
+        
+        # Draw the dotted overlay within the asteroid
+        dot_texture_points = self.get_world_dot_coords()
+        for point in dot_texture_points:
+            # Only draw the points within the asteroids radius
+            point_distance = pygame.math.Vector2.distance_to(point, self.position)
+            if point_distance <= self.radius:
+                if point_distance == 0:
+                    point_distance = 0.1
+                # Change the alpha colour value so the colour becomes more transparent on the edge
+                point_colour = pygame.Color(self.color)
+                point_colour_alpha_correction = point_distance / self.radius * 255
+                point_colour.a = int(point_colour_alpha_correction)
+
+                pygame.draw.circle(screen, point_colour, point, 1)
+
+        if debug_flags.check("DEBUG_ASTEROID_POLYGON_OUTLIERS"): #! DEBUG
+            self.debug_polygon_outliers()
         #pygame.draw.circle(screen, "red", self.position, self.radius, 1)
 
     def debug_polygon_outliers(self) -> None: #! DEBUG
@@ -166,3 +183,17 @@ class Asteroid(CircleShape):
         asteroid_edges.append((point_coords[-1], point_coords[0]))
         
         return asteroid_edges
+    
+    def create_local_dot_texture(self) -> list[pygame.Vector2]:
+        """Creates a square overlay of single points over the asteroid"""
+        point_seperation_step = int(self.radius) // 4
+        local_dot_point_coords = []
+        
+        for y in range(int(-self.radius), int(self.radius), point_seperation_step):
+            for x in range(int(-self.radius), int(self.radius), point_seperation_step):
+                local_dot_point_coords.append(pygame.Vector2(x, y))
+                
+        return local_dot_point_coords
+    
+    def get_world_dot_coords(self) -> list[pygame.Vector2]:
+        return [self.position + point for point in self.local_dot_texture_coords]

@@ -4,6 +4,7 @@ from scenes.main_menu import MainMenu
 from scenes.game_loop import GameLoop
 from scenes.death_transition import DeathTransition, DamageReport
 from scenes.pause_menu import PauseMenu
+from score_keeper import ScoreKeeper
 
 Scene = MainMenu | GameLoop | DeathTransition | DamageReport | PauseMenu
 SceneStore = dict[str, Scene]
@@ -24,6 +25,7 @@ def create_scene_store() -> Callable[..., SceneStore]:
             
             # Rename to game_loop so the rest can be handled by scene creation code below
             scene_name = "game_loop" 
+            ScoreKeeper.reset_time()
             
             if active_scenes.get(scene_name) is None: # Guard against possible error
                 raise Exception("somehow trying to restart game loop without it existing")

@@ -19,9 +19,17 @@ class ScoreKeeperClass:
     player_lives: int = 0 # Current player lives
     shield_active: bool = False
     total_score: int = 0
+    respawn_cost: int = 500 # How much respawning costs if player died
 
     def tick_time(self, dt:float) -> None:
         self.time_passed += dt
+        
+    def reset_time(self) -> None:
+        self.time_passed = 0
+        
+    def player_respawn(self) -> None:
+        self.reset_time()
+        self.total_score -= self.respawn_cost
 
     def track_player_values(self, lives: int, shots: int) -> None:
         self.player_lives = lives

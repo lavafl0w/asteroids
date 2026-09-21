@@ -33,7 +33,9 @@ class AudioManager:
     # Rapid Fire
     rapid_fire_activate: pygame.mixer.Sound | None = None
     rapid_fire_shot: pygame.mixer.Sound | None = None
-
+    # Damage Report
+    player_respawn: pygame.mixer.Sound | None = None
+    player_poor_respawn: pygame.mixer.Sound | None = None
     
     def __init__(self) -> None:
         pass
@@ -85,7 +87,10 @@ class AudioManager:
         self.rapid_fire_activate.set_volume(0.4)
         self.rapid_fire_shot = sound_effect("assets/audio/rapid_fire/rapid-fire-shot.mp3")
         self.rapid_fire_shot.set_volume(0.3)
-
+        # Damage Report
+        self.player_respawn = sound_effect("assets/audio/other/chaching.mp3")
+        self.player_poor_respawn = sound_effect("assets/audio/other/help-me-im-poor.mp3")
+        
     def play_effect(self, sound_effect:pygame.mixer.Sound | None) -> pygame.mixer.Channel | None:
         """Plays the passed in sound effect, returns the channel it's playing on."""            
         if sound_effect is not None:
