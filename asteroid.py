@@ -15,6 +15,13 @@ class Asteroid(CircleShape):
     def __init__(self, x: float, y: float, radius: float) -> None:
         super().__init__(x, y, radius)
         self.local_point_coords: list[pygame.Vector2] = self.create_local_polygon_coords() # Create local polygon points for drawing
+        # Create a new surface to draw a dotted texture over the asteroid
+        texture_size = int(self.radius * 2) + 2
+        self.dot_surface = pygame.Surface(
+            (texture_size, texture_size),
+            pygame.SRCALPHA,
+        )
+        # Get point coordinates for the dotted texture
         self.local_dot_texture_coords: list[pygame.Vector2] = self.create_local_dot_texture()
         self.color = "white"
 
@@ -24,23 +31,24 @@ class Asteroid(CircleShape):
         pygame.draw.polygon(screen, self.color, world_point_coords, LINE_WIDTH)
         
         # Draw the dotted overlay within the asteroid
-        dot_texture_points = self.get_world_dot_coords()
-        for point in dot_texture_points:
-            # Only draw the points within the asteroids radius
-            point_distance = pygame.math.Vector2.distance_to(point, self.position)
+        texture_center = pygame.Vector2(self.dot_surface.get_rect().center)
+        for point in self.local_dot_texture_coords:
+            point_distance = point.distance_to(texture_center)
+            # Check the distance to remove the corner dot coordinates in the square surface
             if point_distance <= self.radius:
-                if point_distance == 0:
-                    point_distance = 0.1
-                # Change the alpha colour value so the colour becomes more transparent on the edge
+                # Change the alpha colour value so the colour becomes more transparent near the edge
                 point_colour = pygame.Color(self.color)
-                point_colour_alpha_correction = point_distance / self.radius * 255
-                point_colour.a = int(point_colour_alpha_correction)
+                point_colour_alpha_correction = int((1 - point_distance / self.radius) * 255)
+                point_colour.a = point_colour_alpha_correction
+                # Draw the points onto the dot surface
+                pygame.draw.circle(self.dot_surface, point_colour, point, 1)
 
-                pygame.draw.circle(screen, point_colour, point, 1)
-
+        # Move the dot texture rect over the asteroid and blits it to the screen
+        texture_rect = self.dot_surface.get_rect(center=self.position)
+        screen.blit(self.dot_surface, texture_rect)
+        
         if debug_flags.check("DEBUG_ASTEROID_POLYGON_OUTLIERS"): #! DEBUG
             self.debug_polygon_outliers()
-        #pygame.draw.circle(screen, "red", self.position, self.radius, 1)
 
     def debug_polygon_outliers(self) -> None: #! DEBUG
         """Print if a local polygon point is suspiciously far from this asteroid."""
@@ -108,15 +116,6 @@ class Asteroid(CircleShape):
         centre_distance = self.position.distance_to(bounce_object.position)
         overlap = (bounce_object.radius + self.radius) - centre_distance
         
-        if debug_flags.check("DEBUG_ASTEROID_OVERLAP_CHECK"):#! DEBUG
-            if overlap > self.radius*2: 
-                print(
-                        "asteroid overlap -> "
-                        f"center={self.position}, radius={self.radius}, "
-                        f"overlap={overlap}, distance={centre_distance}, "
-                        f"other center={bounce_object.position}, other radius={bounce_object.radius}"
-                    )
-        
         # Guard against zero-length vectors before normalizing.
         if push_direction_vector.length() == 0:
             push_direction_vector = pygame.Vector2(1,0)
@@ -131,6 +130,15 @@ class Asteroid(CircleShape):
         # Make the new position a spot away from the other object
         self.position += push_direction_vector * overlap
         
+        if debug_flags.check("DEBUG_ASTEROID_OVERLAP_CHECK"):#! DEBUG
+            if overlap > self.radius*2: 
+                print(
+                        "asteroid overlap -> "
+                        f"center={self.position}, radius={self.radius}, "
+                        f"overlap={overlap}, distance={centre_distance}, "
+                        f"other center={bounce_object.position}, other radius={bounce_object.radius}"
+                    )
+                
     def create_local_polygon_coords(self) -> list[pygame.Vector2]:
         """Creates a list of randomly positioned coordinates for drawing a 'rocky' asteroid shape."""
         #FUTURE: Have different no. of segments depending on size(maybe radius?)
@@ -185,15 +193,12 @@ class Asteroid(CircleShape):
         return asteroid_edges
     
     def create_local_dot_texture(self) -> list[pygame.Vector2]:
-        """Creates a square overlay of single points over the asteroid"""
+        """Creates a square set of single points within the dot surface over the asteroid"""
         point_seperation_step = int(self.radius) // 4
         local_dot_point_coords = []
         
-        for y in range(int(-self.radius), int(self.radius), point_seperation_step):
-            for x in range(int(-self.radius), int(self.radius), point_seperation_step):
+        for y in range(0, self.dot_surface.get_height(), point_seperation_step):
+            for x in range(0, self.dot_surface.get_width(), point_seperation_step):
                 local_dot_point_coords.append(pygame.Vector2(x, y))
                 
         return local_dot_point_coords
-    
-    def get_world_dot_coords(self) -> list[pygame.Vector2]:
-        return [self.position + point for point in self.local_dot_texture_coords]

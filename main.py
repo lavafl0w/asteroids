@@ -6,10 +6,13 @@ from core.audio_manager import audio
 import pygame
 import scene_manager
 
+logger = setup.setup_logger()
+
 def main() -> None:
-    print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
-    print(f"Screen width: {SCREEN_WIDTH}")
-    print(f"Screen height: {SCREEN_HEIGHT}")
+    
+    logger.info(f"====== Started Asteroids with pygame version: {pygame.version.ver} ======")
+    logger.info(f"Screen width: {SCREEN_WIDTH}")
+    logger.info(f"Screen height: {SCREEN_HEIGHT}")
 
     # Start pygame internals and get back the screen and the clock to use
     screen, pygame_clock = setup.setup_pygame()
@@ -41,6 +44,7 @@ def main() -> None:
         # This makes the close button on the window work
         for event in events: 
             if event.type == pygame.QUIT:
+                logger.info("Game closed using the window close button")
                 pygame.quit()
                 return
 
@@ -48,12 +52,14 @@ def main() -> None:
         next_requested_scene_name = current_scene.handle_events(events)
         if next_requested_scene_name is not None:
             if next_requested_scene_name == 'quit':
+                logger.info("Game closed within handle_events function")
                 pygame.quit()
                 return
 
             active_scenes_dict = scene_store(next_requested_scene_name, screen)
             
             if next_requested_scene_name == "game_loop_restart":
+                logger.info("Game restarted!")
                 next_requested_scene_name = "game_loop"
                     
             # Make it the new current scene and remove change request
@@ -67,6 +73,7 @@ def main() -> None:
         next_requested_scene_name = current_scene.update(dt)
         if next_requested_scene_name is not None:    
             if next_requested_scene_name == 'quit':
+                logger.info("Game closed within update function")
                 pygame.quit()
                 return
 

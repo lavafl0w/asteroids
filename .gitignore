@@ -13,6 +13,7 @@ wheels/
 debug_flags_local.py
 assets/unused
 unused/*
+logs/
 
 # Remove .md notes, keeping readme.md
 *.md
