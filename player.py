@@ -25,10 +25,10 @@ from score_keeper import ScoreKeeper
 from core.audio_manager import audio
 
 class Player(CircleShape):    
-    
     def __init__(self, x: float, y:float) -> None:
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
+        self.max_shot_cooldown = PLAYER_SHOT_COOLDOWN_SECONDS
         self.shot_cooldown = 0
         self.hitbox_kind = "triangle"
         self.player_lives = PLAYER_START_LIVES
@@ -38,7 +38,6 @@ class Player(CircleShape):
         self.bullets_fired = 0
         self.rapid_fire_activated = False
         self.rapid_fire_time = 0
-        #self.player_effect_add("rapid_fire") #!
 
     # Simply create triangle points
     def triangle(self) -> TriangleShape:
@@ -96,8 +95,6 @@ class Player(CircleShape):
             # Since rapid fire is activated, adjust shot cooldown accordingly
             if self.shot_cooldown > RAPID_FIRE_COOLDOWN_SECONDS:
                 self.shot_cooldown = RAPID_FIRE_COOLDOWN_SECONDS
-            
-        
         
         # If player is safe after last hit, they are red
         if self.hit_cooldown > 0:
@@ -145,7 +142,7 @@ class Player(CircleShape):
             else:
                 audio.play_effect(audio.player_shot_audio) # Pew pew pew
             
-            self.shot_cooldown = PLAYER_SHOT_COOLDOWN_SECONDS # Set shot cooldown to max
+            self.shot_cooldown = self.max_shot_cooldown # Set shot cooldown to max
             
             self.bullets_fired += 1
             

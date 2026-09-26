@@ -45,7 +45,7 @@ class DeathTransition:
             return 'damage_report'
 
 class DamageReport:
-    '''This is the stats screen'''
+    '''This is the respawn screen'''
     def __init__(self) -> None:
         self.title_font_obj = pygame.font.Font("assets/fonts/orbitron/Orbitron-Bold.ttf", 60)
         self.body_font_obj = pygame.font.Font("assets/fonts/exo/Exo-Regular.ttf", 32)

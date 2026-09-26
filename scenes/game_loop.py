@@ -31,6 +31,13 @@ class GameLoop:
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 return "pause_menu"
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_u:
+                upgrade_success = ScoreKeeper.gun_upgrade_check()
+                if upgrade_success:
+                    audio.play_effect(audio.player_gun_upgrade_audio)
+                    self.player1.max_shot_cooldown -= 0.1
+                else:
+                    audio.play_effect(audio.player_no_upgrade_audio)
     
     def draw(self, screen: pygame.Surface) -> None:
         # Wipe with background image 
@@ -81,7 +88,7 @@ class GameLoop:
             for interactor in self.container_groups["asteroid_interactors"]:
                 if collides(asteroid, interactor):
                     if interactor.hit(): # If the hit connected...            
-                        asteroid.split(interactor) # Call asteroid split logic
+                        asteroid.split(interactor, self.container_groups["powerup_items"]) # Call asteroid split logic
                     else:
                         asteroid.bounce(interactor) # Bounce away from it (for shield on cooldown)
                     

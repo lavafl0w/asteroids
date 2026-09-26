@@ -29,7 +29,8 @@ class HUD:
         
         self.lives_color = "white"
         self.previous_player_lives: int | None = None
-        self.lives_change_time = 0
+        self.lives_colour_change_time = 0
+        self.lives_warning_flash_time = 0
         
         self.shield_active = False
         self.shield_hits_remain = 0
@@ -54,12 +55,13 @@ class HUD:
         blit_sequence = []
         
         minutes_elapsed, seconds_elapsed = divmod(self.total_seconds_elapsed, 60)
-        
+            
         # All the text lines to be displayed
         hud_lines = [
             f"Time Elapsed: {minutes_elapsed}:{seconds_elapsed:02}",
             f"Lives: {ScoreKeeper.player_lives}",
             f"Score: {ScoreKeeper.total_score}",
+            f"[U]pgrade Gun {ScoreKeeper.gun_level}/10: {ScoreKeeper.gun_upgrade_cost}"
             #f"Bullets Fired: {ScoreKeeper.bullets_fired}",
             #f"Asteroids Destroyed: {ScoreKeeper.asteroids_shot}", 
         ]
@@ -71,6 +73,8 @@ class HUD:
         for index, line in enumerate(hud_lines):
             if index == 1: # If line 1 e.g 'Lives: ...'
                 text_surface = self.bottom_bar_font.render(line, 1, self.lives_color)
+            elif index == 3 and ScoreKeeper.gun_level == 10:
+                text_surface = self.bottom_bar_font.render("Gun Level Max!", 1, "white")
             else:
                 text_surface = self.bottom_bar_font.render(line, 1, "white")
             
@@ -111,19 +115,29 @@ class HUD:
         # Picked up life
         if current_lives > self.previous_player_lives:
             self.lives_color = "green"
-            self.lives_change_time = 2    
+            self.lives_colour_change_time = 2    
         # Got hit
         elif current_lives < self.previous_player_lives:
             self.lives_color = "red"
-            self.lives_change_time = 2
+            self.lives_colour_change_time = 2
         
         # Colour change timer ran out
-        if self.lives_change_time <= 0:
-            self.lives_color = "white"
+        if self.lives_colour_change_time <= 0:
+            if current_lives != 1:
+                self.lives_color = "white"
+            
+        if ScoreKeeper.player_lives == 1:
+            if self.lives_color == "white" and self.lives_warning_flash_time <= 0:
+                self.lives_color = "red"
+                self.lives_warning_flash_time = 1
+            elif self.lives_color == "red" and self.lives_warning_flash_time <= 0:
+                self.lives_color = "white"
+                self.lives_warning_flash_time = 1
+            self.lives_warning_flash_time -= dt
         
         # Sets new previous and decrements time
         self.previous_player_lives = current_lives
-        self.lives_change_time -= dt
+        self.lives_colour_change_time -= dt
     
     #? Could probably be looked at later if this is needed    
     def check_shield_info(self) -> None:

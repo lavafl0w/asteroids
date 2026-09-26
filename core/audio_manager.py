@@ -11,6 +11,8 @@ class AudioManager:
     player_shot_audio: pygame.mixer.Sound | None = None
     player_hit_audio: pygame.mixer.Sound | None = None
     player_low_health_audio: pygame.mixer.Sound | None = None
+    player_gun_upgrade_audio: pygame.mixer.Sound | None = None
+    player_no_upgrade_audio: pygame.mixer.Sound | None = None
     # Player health
     player_life_pickup_audio: pygame.mixer.Sound | None = None
     player_life_maximum_audio: pygame.mixer.Sound | None = None
@@ -52,6 +54,8 @@ class AudioManager:
         self.player_shot_audio = self.load_sound("assets/audio/bullets/pew_pew.mp3", 0.5)
         self.player_hit_audio = self.load_sound("assets/audio/player/player_hit_oof.mp3")
         self.player_low_health_audio = self.load_sound("assets/audio/player/fable-health-low.mp3")
+        self.player_gun_upgrade_audio = self.load_sound("assets/audio/other/upgrade_complete.mp3")
+        self.player_no_upgrade_audio = self.load_sound("assets/audio/other/trump-cant-upgrade.mp3")
         # Health specific
         self.player_life_maximum_audio = self.load_sound("assets/audio/health/maximum-patrona-lifes.mp3", 0.5)
         self.player_life_pickup_audio = self.load_sound("assets/audio/health/extra-lifee.mp3", 0.7)

@@ -2,7 +2,7 @@ from circle_shape import CircleShape
 from shot import Shot
 from player import ShieldPowerup
 from core.audio_manager import audio
-from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH, SCREEN_WIDTH, SCREEN_HEIGHT
+from constants import ASTEROID_MIN_RADIUS, LINE_WIDTH, SCREEN_WIDTH, SCREEN_HEIGHT, MAX_ON_SCREEN_POWERUPS
 from powerups.drops import check_powerup_drop
 from score_keeper import ScoreKeeper
 import tools.debug_flags as debug_flags
@@ -76,7 +76,7 @@ class Asteroid(CircleShape):
         ):  
             self.kill() 
 
-    def split(self, interactor:CircleShape) -> None:
+    def split(self, interactor:CircleShape, powerup_items_group: pygame.sprite.Group) -> None:
         """Handles splitting of asteroids into smaller/faster ones when hit"""
         self.kill() # Regardless of size, destroy it
         
@@ -84,7 +84,9 @@ class Asteroid(CircleShape):
 
         # This was a small asteroid
         if self.radius <= ASTEROID_MIN_RADIUS:
-            check_powerup_drop(self.position) # Roll for a possible powerup
+            if len(powerup_items_group) < MAX_ON_SCREEN_POWERUPS:
+                check_powerup_drop(self.position) # Roll for a possible powerup
+                
             if isinstance(interactor, Shot):
                 ScoreKeeper.asteroid_was_shot()
                 ScoreKeeper.add_score("basic_kill")

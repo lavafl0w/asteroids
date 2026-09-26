@@ -18,8 +18,11 @@ class ScoreKeeperClass:
     bombs_activated:int = 0 # How many bombs got activated
     player_lives: int = 0 # Current player lives
     shield_active: bool = False
-    total_score: int = 0
+    total_score: int = 50000
     respawn_cost: int = 500 # How much respawning costs if player died
+    respawn_times: int = 0 # How many times the player has chosen to respawn
+    gun_level:int = 0
+    gun_upgrade_cost:int = 500
 
     def tick_time(self, dt:float) -> None:
         self.time_passed += dt
@@ -30,6 +33,8 @@ class ScoreKeeperClass:
     def player_respawn(self) -> None:
         self.reset_time()
         self.total_score -= self.respawn_cost
+        self.respawn_times += 1
+        self.respawn_cost += 100
 
     def track_player_values(self, lives: int, shots: int) -> None:
         self.player_lives = lives
@@ -56,6 +61,14 @@ class ScoreKeeperClass:
             self.total_score += BOMB_DESTROYED_POINTS
         elif score_modifier_item == "shield_kill":
             self.total_score += SHIELD_DESTROYED_POINTS
+            
+    def gun_upgrade_check(self) -> bool:
+        if self.total_score >= self.gun_upgrade_cost and self.gun_level < 10:
+            self.gun_level += 1
+            self.total_score -= self.gun_upgrade_cost
+            self.gun_upgrade_cost += 1000
+            return True
+        return False
 
 # Used to refer back to the same object to track updating values
 ScoreKeeper = ScoreKeeperClass()
